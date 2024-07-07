@@ -19,7 +19,7 @@ fn test2() {
     }
 }
 fn test() {
-    let mut r = SRand(2171992800u32 as i32);
+    let mut r = SRand(2171992800);
     r.mutate();
     println!("{}", r.rand_helper(221 - 1));
     r.mutate();
@@ -49,10 +49,10 @@ fn brute_force() {
     // cavity 15
 }
 
-struct SRand(i32);
+struct SRand(u32);
 
 impl SRand {
-    fn next_seed(&self) -> i32 {
+    fn next_seed(&self) -> u32 {
         self.0.wrapping_mul(0xbb38435).wrapping_add(0x3619636b)
     }
     fn mutate(&mut self) {
@@ -62,7 +62,7 @@ impl SRand {
         self.mutate();
         f32::from_bits(0x3f800000 | self.0 as u32 >> 9) - 1.0
     }
-    fn get_unsigned_int(&mut self) -> i32 {
+    fn get_unsigned_int(&mut self) -> u32 {
         //self.mutate();
         self.0
     }
@@ -75,6 +75,10 @@ impl SRand {
     }
     fn rand_range(&mut self, min: i32, max: i32) -> i32 {
         min + self.rand_helper(max - min + 1)
+    }
+    fn rand_item<'a, T>(&mut self, slice: &'a [T]) -> &'a T {
+        let i = self.rand_helper(slice.len() as i32) as usize;
+        &slice[i]
     }
 }
 
@@ -140,7 +144,7 @@ struct FGlobalMissionSeed {
 }
 
 fn get_missions(seed: &FGlobalMissionSeed) {
-    let mut rand = SRand(seed.random_seed);
+    let mut rand = SRand(seed.random_seed as u32);
     let season = data::ESeason::from_index(seed.season as usize);
 
     let mut helpers = init_helpers(&mut rand);
@@ -240,5 +244,44 @@ mod test {
             rand.mutate();
             println!("next = {:X}", rand.next_seed());
         }
+    }
+
+    #[test]
+    fn test_deep_dive() {
+        let seed_v2 = 83255885;
+        let deep_dive_seed = seed_v2 & 0x1ffff;
+        let mut rand = SRand(deep_dive_seed);
+        let biome = rand.rand_item(data::EBiome::VARIANTS);
+        dbg!(biome);
+
+        // normal
+        let mut rand = SRand(deep_dive_seed ^ 0x929);
+        let first = rand.rand_item(data::names_first());
+        let last = rand.rand_item(data::names_last());
+        println!("{first} {last}");
+
+        // elite
+        let mut rand = SRand(deep_dive_seed ^ 0x1300);
+        let first = rand.rand_item(data::names_first());
+        let last = rand.rand_item(data::names_last());
+        println!("{first} {last}");
+    }
+
+    #[test]
+    fn test_global_mission_seed() {
+        let now = time::OffsetDateTime::now_utc();
+        let month = now.month() as u32;
+        let day = now.day() as u32;
+        let year = now.year() as u32;
+        let hour = now.hour() as u32;
+        let minute = now.minute() as u32;
+
+        let seed = ((year * 0x2a90af)
+            ^ (month * 0x4f9ffb7)
+            ^ (day * 0x73387)
+            ^ (hour * 0x5b53f5)
+            ^ (minute / 30))
+            % 100000;
+        dbg!(seed);
     }
 }
