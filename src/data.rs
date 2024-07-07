@@ -337,3 +337,8 @@ pub enum ESeasonMissionMapOverlayType {
 pub struct USeason {
     pub mission_map_event_zone_type: ESeasonMissionMapOverlayType,
 }
+
+#[derive(Debug)]
+pub struct UGeneratedMission {
+    pub biome: EBiome,
+}

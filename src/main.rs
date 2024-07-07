@@ -101,20 +101,20 @@ fn sample_zones(rand: &mut SRand, zone: EPlanetZone) -> data::EBiome {
 }
 
 #[derive(Debug)]
-struct HelperStruct {
+struct FPlanetZoneItem {
     biomes: Vec<data::EBiome>,
-    b: Vec<()>,
+    missions: Vec<data::UGeneratedMission>,
     zone: &'static EPlanetZone,
     plague_MAYBE: bool,
     picked_MAYBE: bool,
 }
 
-fn init_helpers(rand: &mut SRand) -> Vec<HelperStruct> {
+fn init_helpers(rand: &mut SRand) -> Vec<FPlanetZoneItem> {
     let mut helpers = vec![];
     for zone in data::EPlanetZone::VARIANTS {
-        helpers.push(HelperStruct {
+        helpers.push(FPlanetZoneItem {
             biomes: vec![sample_zones(rand, *zone)],
-            b: vec![],
+            missions: vec![],
             zone,
             plague_MAYBE: false,
             picked_MAYBE: false,
