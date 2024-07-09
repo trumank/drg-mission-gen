@@ -13,47 +13,12 @@ use crate::data::{
 };
 
 fn main() {
-    test2();
-    //brute_force();
-}
-
-fn test2() {
-    //let mut r = SRand(2171992800);
-    for i in 0..10 {
-        let mut r = SRand(i);
-        r.mutate();
-        println!("{}", r.get_unsigned_int() % 100);
-    }
-}
-fn test() {
-    let mut r = SRand(2171992800);
-    r.mutate();
-    println!("{}", r.rand_helper(221 - 1));
-    r.mutate();
-    println!("{}", r.rand_helper(237 - 1));
-}
-
-fn brute_force() {
-    let mut r = SRand(0);
-    //r.mutate();
-    //while r.0 != 0 {
-    for _ in 0..u32::MAX {
-        let seed = r.0;
-        r.mutate();
-        //while r.next_seed() > 1000000000 { r.mutate() };
-        if 195 == r.rand_helper(221 - 1) {
-            r.mutate();
-            if 15 == r.rand_helper(237 - 1) {
-                println!("found match {}", seed);
-            }
-        }
-        //println!("{}", r.rand_range(0, 1));
-    }
-    // mythic 195
-    // full 194
-    // loaded 193
-
-    // cavity 15
+    let (normal, hard) = gen_deep_dive_pair(
+        u32::from_str_radix(&std::env::args().nth(1).expect("expected seed"), 10)
+            .expect("failed to parse seed as number"),
+    );
+    println!("DD = {normal:#?}");
+    println!("EDD = {hard:#?}");
 }
 
 struct SRand(u32);
@@ -318,12 +283,12 @@ fn deep_dive_get_mission(
         }
     }
 
-    let d = items
-        .iter()
-        .enumerate()
-        .map(|(i, item)| format!("{i}: {:?}", item.mission))
-        .collect::<Vec<_>>();
-    dbg!(d);
+    //let d = items
+    //    .iter()
+    //    .enumerate()
+    //    .map(|(i, item)| format!("{i}: {:?}", item.mission))
+    //    .collect::<Vec<_>>();
+    //dbg!(d);
 
     let mut probabilities = vec![];
     for (i, item) in items.iter().enumerate() {
@@ -332,8 +297,6 @@ fn deep_dive_get_mission(
         }
     }
     let i = rand.rand_item(&probabilities);
-    //dbg!(&items);
-    //println!("prob = {probabilities:?}");
     let selected = &items[*i];
 
     if selected.can_only_appear_once_per_deep_dive_set {
@@ -553,33 +516,37 @@ mod test {
     fn test_deep_dive() {
         let seed_v2 = 83255885;
         let deep_dive_seed = seed_v2 & 0x1ffff;
-        let deep_dive_seed = 122106; // prev week
-                                     //let deep_dive_seed = 37731; // prev week
-                                     //let deep_dive_seed = 71169; // prev week
+        let deep_dive_seed = 122106;
+        //let deep_dive_seed = 37731;
+        //let deep_dive_seed = 71169;
 
-        //for seed in 0..1000 {
-        //    let (normal, hard) = gen_deep_dive_pair(seed);
+        let mut count_a = 0;
+        let mut count_b = 0;
+        for seed in 0..1000 {
+            let (normal, hard) = gen_deep_dive_pair(seed);
 
-        //    let a = normal
-        //        .missions
-        //        .iter()
-        //        .any(|m| m.template == EMissionTemplate::MissionType_Facility);
-        //    let b = hard
-        //        .missions
-        //        .iter()
-        //        .any(|m| m.template == EMissionTemplate::MissionType_Facility);
-        //    if a && b {
-        //        dbg!(normal);
-        //        dbg!(hard);
-        //        println!("seed = {seed}");
-        //        break;
-        //    }
-        //}
+            let a = normal
+                .missions
+                .iter()
+                .any(|m| m.template == EMissionTemplate::MissionType_Facility);
+            let b = hard
+                .missions
+                .iter()
+                .any(|m| m.template == EMissionTemplate::MissionType_Facility);
+            count_a += a as u32;
+            count_b += b as u32;
+            if a && b {
+                dbg!(normal);
+                dbg!(hard);
+                println!("seed = {seed}");
+                break;
+            }
+        }
+        println!("{count_a} {count_b}");
 
-        let (normal, hard) = gen_deep_dive_pair(26);
-
-        dbg!(normal);
-        dbg!(hard);
+        //let (normal, hard) = gen_deep_dive_pair(71169);
+        //dbg!(normal);
+        //dbg!(hard);
     }
 
     #[test]

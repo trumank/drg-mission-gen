@@ -833,8 +833,8 @@ pub struct UGeneratedMission {
 #[derive(Debug)]
 pub struct UDeepDive {
     pub name: String,
-    pub missions: Vec<UGeneratedMission>,
     pub biome: EBiome,
+    pub missions: Vec<UGeneratedMission>,
 }
 
 pub fn names_first() -> &'static [&'static str] {
