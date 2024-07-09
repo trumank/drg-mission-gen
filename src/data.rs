@@ -290,6 +290,142 @@ pub fn get_mission_setup() -> &'static UMissionSetup {
     }
 }
 
+#[derive(Debug)]
+pub struct UDeepDiveTemplate {
+    pub missions: &'static [FDeepDiveTemplateItem],
+    pub mutator_count: FRandInterval,
+    pub warning_count: FRandInterval,
+}
+
+#[derive(Debug)]
+pub struct FRandInterval {
+    pub intervals: &'static [FRandIntervalItem],
+}
+#[derive(Debug)]
+pub struct FRandIntervalItem {
+    pub weight: f32,
+    pub range: FIRandRange,
+}
+
+#[derive(Debug)]
+pub struct FDeepDiveTemplateItem {
+    pub mission: EMissionTemplate,
+    pub probability: u32,
+    pub allowed_durations: &'static [EMissionDuration],
+    pub allowed_complexities: &'static [EMissionComplexity],
+    pub can_only_appear_once: bool,
+    pub can_only_appear_once_per_deep_dive_set: bool,
+}
+
+pub fn get_normal_template() -> &'static UDeepDiveTemplate {
+    &UDeepDiveTemplate {
+        mutator_count: FRandInterval {
+            intervals: &[
+                FRandIntervalItem {
+                    weight: 1.0,
+                    range: FIRandRange { min: 0, max: 0 },
+                },
+                FRandIntervalItem {
+                    weight: 1.0,
+                    range: FIRandRange { min: 1, max: 1 },
+                },
+            ],
+        },
+        warning_count: FRandInterval {
+            intervals: &[
+                FRandIntervalItem {
+                    weight: 1.0,
+                    range: FIRandRange { min: 2, max: 2 },
+                },
+                FRandIntervalItem {
+                    weight: 1.0,
+                    range: FIRandRange { min: 2, max: 2 },
+                },
+            ],
+        },
+        missions: &[
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_Elimination,
+                probability: 10,
+                allowed_durations: &[EMissionDuration::MD_Duration_Normal],
+                allowed_complexities: &[],
+                can_only_appear_once: false,
+                can_only_appear_once_per_deep_dive_set: false,
+            },
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_Extraction,
+                probability: 10,
+                allowed_durations: &[
+                    EMissionDuration::MD_Duration_Normal,
+                    EMissionDuration::MD_Duration_Short,
+                ],
+                allowed_complexities: &[],
+                can_only_appear_once: false,
+                can_only_appear_once_per_deep_dive_set: false,
+            },
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_Salvage,
+                probability: 10,
+                allowed_durations: &[],
+                allowed_complexities: &[],
+                can_only_appear_once: false,
+                can_only_appear_once_per_deep_dive_set: false,
+            },
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_EggCollection,
+                probability: 10,
+                allowed_durations: &[
+                    EMissionDuration::MD_Duration_Normal,
+                    EMissionDuration::MD_Duration_Short,
+                ],
+                allowed_complexities: &[],
+                can_only_appear_once: false,
+                can_only_appear_once_per_deep_dive_set: false,
+            },
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_Motherlode,
+                probability: 10,
+                allowed_durations: &[],
+                allowed_complexities: &[],
+                can_only_appear_once: false,
+                can_only_appear_once_per_deep_dive_set: false,
+            },
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_Refinery,
+                probability: 10,
+                allowed_durations: &[EMissionDuration::MD_Duration_Normal],
+                allowed_complexities: &[],
+                can_only_appear_once: false,
+                can_only_appear_once_per_deep_dive_set: false,
+            },
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_Escort,
+                probability: 7,
+                allowed_durations: &[EMissionDuration::MD_Duration_Normal],
+                allowed_complexities: &[],
+                can_only_appear_once: true,
+                can_only_appear_once_per_deep_dive_set: false,
+            },
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_Facility,
+                probability: 5,
+                allowed_durations: &[],
+                allowed_complexities: &[EMissionComplexity::MD_Complexity_Simple],
+                can_only_appear_once: false,
+                can_only_appear_once_per_deep_dive_set: true,
+            },
+            FDeepDiveTemplateItem {
+                mission: EMissionTemplate::MissionType_DeepScan,
+                probability: 10,
+                allowed_durations: &[],
+                allowed_complexities: &[],
+                can_only_appear_once: false,
+                can_only_appear_once_per_deep_dive_set: false,
+            },
+        ],
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
 pub enum ESeason {
     Season0,
@@ -340,7 +476,11 @@ pub struct USeason {
 
 #[derive(Debug)]
 pub struct UGeneratedMission {
+    pub seed: u32,
+    pub template: EMissionTemplate,
     pub biome: EBiome,
+    pub complexity_limit: Option<EMissionComplexity>,
+    pub duration_limit: Option<EMissionDuration>,
 }
 
 pub fn names_first() -> &'static [&'static str] {

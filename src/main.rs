@@ -1,9 +1,9 @@
 mod data;
 
-use data::EPlanetZone;
+use data::{EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UGeneratedMission};
 use strum::VariantArray;
 
-use crate::data::get_mission_setup;
+use crate::data::{get_mission_setup, EMissionComplexity, EMissionDuration, EMissionTemplate};
 
 fn main() {
     test2();
@@ -57,6 +57,7 @@ impl SRand {
     }
     fn mutate(&mut self) {
         self.0 = self.next_seed();
+        //println!("MUTATE SEED {}", self.0);
     }
     fn get_fraction(&mut self) -> f32 {
         self.mutate();
@@ -104,6 +105,22 @@ fn sample_zones(rand: &mut SRand, zone: EPlanetZone) -> data::EBiome {
         .unwrap()
 }
 
+fn sample_rand_interval(rand: &mut SRand, interval: &FRandInterval) -> i32 {
+    let total: f32 = interval.intervals.iter().map(|b| b.weight).sum();
+
+    let mut sum = 0.0;
+    let select = rand.get_fraction() * total;
+
+    interval
+        .intervals
+        .iter()
+        .find_map(|i| {
+            sum += i.weight;
+            (sum >= select).then(|| rand.rand_range(i.range.min, i.range.max))
+        })
+        .unwrap_or_default()
+}
+
 #[derive(Debug)]
 struct FPlanetZoneItem {
     biomes: Vec<data::EBiome>,
@@ -133,6 +150,12 @@ fn shuffle<T>(rand: &mut SRand, vec: &mut Vec<T>) {
         let swap_index = rand.rand_helper(vec.len() as i32) as usize;
         println!("swap {} {}", i, swap_index);
         vec.swap(i, swap_index);
+    }
+}
+
+fn randomly_shrink<T>(rand: &mut SRand, size: usize, vec: &mut Vec<T>) {
+    while vec.len() > size {
+        vec.swap_remove(rand.rand_helper(vec.len() as i32) as usize);
     }
 }
 
@@ -209,6 +232,89 @@ fn get_missions(seed: &FGlobalMissionSeed) {
     dbg!(&global_missions);
 }
 
+fn deep_dive_get_mission(
+    templates: &[FDeepDiveTemplateItem],
+    existing_missions: &[UGeneratedMission],
+    rand: &mut SRand,
+) -> (
+    EMissionTemplate,
+    Option<EMissionDuration>,
+    Option<EMissionComplexity>,
+) {
+    #[derive(Debug)]
+    struct HelperStructA {
+        mission: EMissionTemplate,
+        duration: Option<EMissionDuration>,
+        complexity: Option<EMissionComplexity>,
+        probability: u32,
+        can_only_appear_once_per_deep_dive_set: bool,
+    }
+
+    let mut items = vec![];
+    for template in templates {
+        if let Some(last) = existing_missions.last() {
+            if last.template == template.mission {
+                // do not allow consecutive mission of same type
+                continue;
+            }
+        }
+        if template.can_only_appear_once
+            && existing_missions
+                .iter()
+                .any(|m| m.template == template.mission)
+        {
+            continue;
+        }
+        if template.allowed_durations.is_empty() {
+            if template.allowed_complexities.is_empty() {
+                items.push(HelperStructA {
+                    mission: template.mission,
+                    duration: None,
+                    complexity: None,
+                    probability: template.probability,
+                    can_only_appear_once_per_deep_dive_set: template
+                        .can_only_appear_once_per_deep_dive_set,
+                });
+            } else {
+                for complexity in template.allowed_complexities {
+                    items.push(HelperStructA {
+                        mission: template.mission,
+                        duration: None,
+                        complexity: Some(*complexity),
+                        probability: template.probability,
+                        can_only_appear_once_per_deep_dive_set: template
+                            .can_only_appear_once_per_deep_dive_set,
+                    });
+                }
+            }
+        } else {
+            for duration in template.allowed_durations {
+                items.push(HelperStructA {
+                    mission: template.mission,
+                    duration: Some(*duration),
+                    complexity: None,
+                    probability: template.probability,
+                    can_only_appear_once_per_deep_dive_set: template
+                        .can_only_appear_once_per_deep_dive_set,
+                });
+            }
+        }
+    }
+
+    let mut probabilities = vec![];
+    for (i, item) in items.iter().enumerate() {
+        for _ in 0..item.probability {
+            probabilities.push(i);
+        }
+    }
+    let i = rand.rand_item(&probabilities);
+    //dbg!(&items);
+    //println!("prob = {probabilities:?}");
+    let selected = &items[*i];
+
+    (selected.mission, selected.duration, selected.complexity)
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -250,21 +356,78 @@ mod test {
     fn test_deep_dive() {
         let seed_v2 = 83255885;
         let deep_dive_seed = seed_v2 & 0x1ffff;
+        //let deep_dive_seed = 122106; // prev week
+        //let deep_dive_seed = 37731; // prev week
+        //let deep_dive_seed = 71169; // prev week
         let mut rand = SRand(deep_dive_seed);
         let biome = rand.rand_item(data::EBiome::VARIANTS);
         dbg!(biome);
+        dbg!(deep_dive_seed);
+
+        let template = data::get_normal_template();
 
         // normal
-        let mut rand = SRand(deep_dive_seed ^ 0x929);
-        let first = rand.rand_item(data::names_first());
-        let last = rand.rand_item(data::names_last());
-        println!("{first} {last}");
+        {
+            let mut rand = SRand(deep_dive_seed ^ 0x929);
+            //rand.0 = 39498;
+            //let mut rand = SRand(5);
+            let first = rand.rand_item(data::names_first());
+            let last = rand.rand_item(data::names_last());
+            println!("DD = {first} {last}");
+
+            // mutators
+            let mut mutator_indexes = vec![0, 1, 2];
+            let mutator_count = sample_rand_interval(&mut rand, &template.mutator_count);
+            randomly_shrink(&mut rand, mutator_count as usize, &mut mutator_indexes);
+
+            // warnings
+            let mut warning_indexes = vec![0, 1, 2];
+            let warning_count = sample_rand_interval(&mut rand, &template.warning_count);
+            randomly_shrink(&mut rand, warning_count as usize, &mut warning_indexes);
+
+            println!("mutator_indexes = {mutator_indexes:?}");
+            println!("warning_indexes = {warning_indexes:?}");
+
+            let mut stages = vec![];
+            for i in 0..3 {
+                let stage_template = deep_dive_get_mission(template.missions, &stages, &mut rand);
+                dbg!(stage_template.0);
+
+                rand.mutate();
+                let mission_seed = rand.0;
+
+                if mutator_indexes.contains(&i) {
+                    rand.mutate();
+                }
+                if warning_indexes.contains(&i) {
+                    rand.mutate();
+                }
+
+                if i != 0 {
+                    // loader sequence randomness for stages 2 & 3
+                    rand.mutate();
+                }
+
+                let stage = UGeneratedMission {
+                    seed: mission_seed,
+                    template: stage_template.0,
+                    biome: *biome,
+                    complexity_limit: stage_template.2,
+                    duration_limit: stage_template.1,
+                };
+
+                stages.push(stage);
+            }
+            dbg!(stages);
+        }
 
         // elite
-        let mut rand = SRand(deep_dive_seed ^ 0x1300);
-        let first = rand.rand_item(data::names_first());
-        let last = rand.rand_item(data::names_last());
-        println!("{first} {last}");
+        {
+            let mut rand = SRand(deep_dive_seed ^ 0x1300);
+            let first = rand.rand_item(data::names_first());
+            let last = rand.rand_item(data::names_last());
+            println!("EDD = {first} {last}");
+        }
     }
 
     #[test]
