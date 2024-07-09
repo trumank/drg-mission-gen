@@ -1,6 +1,9 @@
 mod data;
 
-use data::{EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UGeneratedMission};
+use data::{
+    EMissionMutator, EMissionWarning, EObjective, EPlanetZone, FDeepDiveTemplateItem,
+    FRandInterval, UGeneratedMission,
+};
 use strum::VariantArray;
 
 use crate::data::{get_mission_setup, EMissionComplexity, EMissionDuration, EMissionTemplate};
@@ -315,8 +318,67 @@ fn deep_dive_get_mission(
     (selected.mission, selected.duration, selected.complexity)
 }
 
+fn select_mutator(
+    mutators: &[EMissionMutator],
+    primary_objective: EObjective,
+    secondary_objectives: &[EObjective],
+    rand: &mut SRand,
+) -> EMissionMutator {
+    let mut pool = mutators.to_vec();
+    let mut i = pool.len() - 1;
+    loop {
+        let m = pool[i];
+        let incompatible = m.is_banned_objective(primary_objective)
+            || secondary_objectives
+                .iter()
+                .any(|s| m.is_banned_objective(*s));
+
+        if incompatible {
+            pool.swap_remove(i);
+        }
+
+        if i == 0 {
+            break;
+        }
+        i -= 1;
+    }
+
+    *rand.rand_item(&pool)
+}
+fn select_warning(
+    warnings: &[EMissionWarning],
+    mutator: Option<EMissionMutator>,
+    primary_objective: EObjective,
+    secondary_objectives: &[EObjective],
+    rand: &mut SRand,
+) -> EMissionWarning {
+    let mut pool = warnings.to_vec();
+    let mut i = pool.len() - 1;
+    loop {
+        let w = pool[i];
+        let incompatible = w.is_banned_objective(primary_objective)
+            || secondary_objectives
+                .iter()
+                .any(|s| w.is_banned_objective(*s))
+            || mutator.map(|m| w.is_banned_mutator(m)).unwrap_or_default();
+
+        if incompatible {
+            pool.swap_remove(i);
+        }
+
+        if i == 0 {
+            break;
+        }
+        i -= 1;
+    }
+
+    *rand.rand_item(&pool)
+}
+
 #[cfg(test)]
 mod test {
+    use crate::data::get_deep_dive_settings;
+
     use super::*;
 
     #[test]
@@ -356,9 +418,9 @@ mod test {
     fn test_deep_dive() {
         let seed_v2 = 83255885;
         let deep_dive_seed = seed_v2 & 0x1ffff;
-        //let deep_dive_seed = 122106; // prev week
-        //let deep_dive_seed = 37731; // prev week
-        //let deep_dive_seed = 71169; // prev week
+        let deep_dive_seed = 122106; // prev week
+                                     //let deep_dive_seed = 37731; // prev week
+                                     //let deep_dive_seed = 71169; // prev week
         let mut rand = SRand(deep_dive_seed);
         let biome = rand.rand_item(data::EBiome::VARIANTS);
         dbg!(biome);
@@ -369,6 +431,7 @@ mod test {
         // normal
         {
             let mut rand = SRand(deep_dive_seed ^ 0x929);
+            dbg!(rand.0);
             //rand.0 = 39498;
             //let mut rand = SRand(5);
             let first = rand.rand_item(data::names_first());
@@ -388,6 +451,9 @@ mod test {
             println!("mutator_indexes = {mutator_indexes:?}");
             println!("warning_indexes = {warning_indexes:?}");
 
+            let mut mutators = get_deep_dive_settings().mutators.to_vec();
+            let mut warnings = get_deep_dive_settings().warnings.to_vec();
+
             let mut stages = vec![];
             for i in 0..3 {
                 let stage_template = deep_dive_get_mission(template.missions, &stages, &mut rand);
@@ -395,12 +461,35 @@ mod test {
 
                 rand.mutate();
                 let mission_seed = rand.0;
+                let mut mission_rand = SRand(mission_seed);
+                let mission_template = &stage_template.0.get().mission_template;
+                let primary_objective = mission_template.primary_objective;
+                let secondary_objectives =
+                    vec![*mission_rand.rand_item(mission_template.deep_dive_objectives)];
+
+                let mut mutator = None;
+                let mut warning = None;
 
                 if mutator_indexes.contains(&i) {
-                    rand.mutate();
+                    let r = select_mutator(
+                        &mutators,
+                        primary_objective,
+                        &secondary_objectives,
+                        &mut rand,
+                    );
+                    mutators.swap_remove(mutators.iter().rposition(|i| *i == r).unwrap());
+                    mutator = Some(r)
                 }
                 if warning_indexes.contains(&i) {
-                    rand.mutate();
+                    let r = select_warning(
+                        &warnings,
+                        mutator,
+                        primary_objective,
+                        &secondary_objectives,
+                        &mut rand,
+                    );
+                    warnings.swap_remove(warnings.iter().rposition(|i| *i == r).unwrap());
+                    warning = Some(r)
                 }
 
                 if i != 0 {
@@ -412,6 +501,10 @@ mod test {
                     seed: mission_seed,
                     template: stage_template.0,
                     biome: *biome,
+                    primary_objective,
+                    secondary_objectives,
+                    warnings: warning.into_iter().collect(),
+                    mutators: mutator.into_iter().collect(),
                     complexity_limit: stage_template.2,
                     duration_limit: stage_template.1,
                 };

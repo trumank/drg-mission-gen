@@ -178,7 +178,10 @@ pub struct FMissionTemplateItem {
 }
 
 #[derive(Debug)]
-pub struct UMissionTemplate {}
+pub struct UMissionTemplate {
+    pub primary_objective: EObjective,
+    pub deep_dive_objectives: &'static [EObjective],
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
 pub enum EMissionTemplate {
@@ -196,39 +199,126 @@ impl EMissionTemplate {
     pub fn get(&self) -> &'static FMissionTemplateItem {
         match self {
             EMissionTemplate::MissionType_Extraction => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_1st_Extraction,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_AlienEggs,
+                        EObjective::OBJ_DD_Elimination_Eggs,
+                        EObjective::OBJ_DD_Defense,
+                        EObjective::OBJ_DD_RepairMinimules,
+                        EObjective::OBJ_DD_DeepScan,
+                        EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                },
                 rarity: 1.0,
             },
             EMissionTemplate::MissionType_Motherlode => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_1st_PointExtraction,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_AlienEggs,
+                        EObjective::OBJ_DD_Morkite,
+                        EObjective::OBJ_DD_Elimination_Eggs,
+                        EObjective::OBJ_DD_Defense,
+                        EObjective::OBJ_DD_DeepScan,
+                        EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                },
                 rarity: 0.5,
             },
             EMissionTemplate::MissionType_EggCollection => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_1st_Gather_AlienEggs,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_Morkite,
+                        EObjective::OBJ_DD_Elimination_Eggs,
+                        EObjective::OBJ_DD_Defense,
+                        EObjective::OBJ_DD_RepairMinimules,
+                        EObjective::OBJ_DD_DeepScan,
+                        EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                },
                 rarity: 0.5,
             },
             EMissionTemplate::MissionType_Elimination => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_Eliminate_Eggs,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_AlienEggs,
+                        EObjective::OBJ_DD_Morkite,
+                        EObjective::OBJ_DD_Defense,
+                        EObjective::OBJ_DD_RepairMinimules,
+                        EObjective::OBJ_DD_DeepScan,
+                        EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                },
                 rarity: 0.5,
             },
             EMissionTemplate::MissionType_Salvage => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_1st_Salvage,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_AlienEggs,
+                        EObjective::OBJ_DD_Morkite,
+                        EObjective::OBJ_DD_Elimination_Eggs,
+                        EObjective::OBJ_DD_DeepScan,
+                        EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                },
                 rarity: 0.5,
             },
             EMissionTemplate::MissionType_Escort => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_1st_Escort,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_AlienEggs,
+                        EObjective::OBJ_DD_Morkite,
+                        EObjective::OBJ_DD_RepairMinimules,
+                        EObjective::OBJ_DD_DeepScan,
+                        EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                },
                 rarity: 0.5,
             },
             EMissionTemplate::MissionType_Refinery => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_1st_Refinery,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_AlienEggs,
+                        EObjective::OBJ_DD_Morkite,
+                        EObjective::OBJ_DD_Elimination_Eggs,
+                        EObjective::OBJ_DD_Defense,
+                        EObjective::OBJ_DD_DeepScan,
+                    ],
+                },
                 rarity: 0.5,
             },
             EMissionTemplate::MissionType_Facility => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_1st_Facility,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_AlienEggs,
+                        EObjective::OBJ_DD_Morkite,
+                        EObjective::OBJ_DD_Elimination_Eggs,
+                        EObjective::OBJ_DD_RepairMinimules,
+                        EObjective::OBJ_DD_DeepScan,
+                        EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                },
                 rarity: 0.0,
             },
             EMissionTemplate::MissionType_DeepScan => &FMissionTemplateItem {
-                mission_template: UMissionTemplate {},
+                mission_template: UMissionTemplate {
+                    primary_objective: EObjective::OBJ_1st_DeepScan,
+                    deep_dive_objectives: &[
+                        EObjective::OBJ_DD_Morkite,
+                        EObjective::OBJ_DD_Elimination_Eggs,
+                        EObjective::OBJ_DD_Defense,
+                        EObjective::OBJ_DD_RepairMinimules,
+                        EObjective::OBJ_DD_AlienEggs,
+                        EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                },
                 rarity: 1.0,
             },
         }
@@ -286,6 +376,40 @@ pub fn get_mission_setup() -> &'static UMissionSetup {
                 duration: EMissionDuration::MD_Duration_Normal,
                 can_have_mutators: true,
             },
+        ],
+    }
+}
+
+#[derive(Debug)]
+pub struct UDeepDiveSettings {
+    pub mutators: &'static [EMissionMutator],
+    pub warnings: &'static [EMissionWarning],
+}
+pub fn get_deep_dive_settings() -> &'static UDeepDiveSettings {
+    &UDeepDiveSettings {
+        mutators: &[
+            EMissionMutator::MMUT_LowGravity,
+            EMissionMutator::MMUT_OxygenRich,
+            EMissionMutator::MMUT_ExplosiveEnemies,
+            EMissionMutator::MMUT_Weakspot,
+            EMissionMutator::MMUT_BloodSugar,
+        ],
+        warnings: &[
+            EMissionWarning::WRN_RegenerativeEnemies,
+            EMissionWarning::WRN_LethalEnemies,
+            EMissionWarning::WRN_NoOxygen,
+            EMissionWarning::WRN_InfestedEnemies,
+            EMissionWarning::WRN_Ghost,
+            EMissionWarning::WRN_CaveLeechDen,
+            EMissionWarning::WRN_ExploderInfestation,
+            EMissionWarning::WRN_MacteraCave,
+            EMissionWarning::WRN_NoShields,
+            EMissionWarning::WRN_HeroEnemies,
+            EMissionWarning::WRN_Swarmagedon,
+            EMissionWarning::WRN_RivalIncursion,
+            EMissionWarning::WRN_BulletHell,
+            EMissionWarning::WRN_RockInfestation,
+            EMissionWarning::WRN_BulletHell,
         ],
     }
 }
@@ -427,6 +551,117 @@ pub fn get_normal_template() -> &'static UDeepDiveTemplate {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+pub enum EObjective {
+    OBJ_1st_DeepScan,
+    OBJ_1st_Escort,
+    OBJ_1st_Extraction,
+    OBJ_1st_Facility,
+    OBJ_1st_Gather_AlienEggs,
+    OBJ_1st_PointExtraction,
+    OBJ_1st_Refinery,
+    OBJ_1st_Salvage,
+    OBJ_1st_Tutorial,
+    OBJ_2nd_DestroyBhaBarnacles,
+    OBJ_2nd_DestroyEggs,
+    OBJ_2nd_Find_ApocaBloom,
+    OBJ_2nd_Find_BooloCap,
+    OBJ_2nd_Find_Ebonut,
+    OBJ_2nd_Find_Fossil,
+    OBJ_2nd_Find_Gunkseed,
+    OBJ_2nd_KillFleas,
+    OBJ_2nd_Mine_Dystrum,
+    OBJ_2nd_Mine_Hollomite,
+    OBJ_DD_AlienEggs,
+    OBJ_DD_DeepScan,
+    OBJ_DD_Defense,
+    OBJ_DD_Elimination_Eggs,
+    OBJ_DD_Morkite,
+    OBJ_DD_MorkiteWell,
+    OBJ_DD_RepairMinimules,
+    OBJ_Eliminate_Eggs,
+    OBJ_Elimination_Base,
+    OBJ_Extraction_Base,
+    OBJ_FindItems_Base,
+    OBJ_Gather_Gems_Base,
+    OBJ_WRN_Plague,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+pub enum EMissionMutator {
+    MMUT_ExplosiveEnemies,
+    MMUT_ExterminationContract,
+    MMUT_SecretSecondary,
+    MMUT_XXXP,
+    MMUT_GoldRush,
+    MMUT_OxygenRich,
+    MMUT_RichInMinerals,
+    MMUT_Weakspot,
+    MMUT_BloodSugar,
+    MMUT_LowGravity,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+pub enum EMissionWarning {
+    WRN_RegenerativeEnemies,
+    WRN_HeroEnemies,
+    WRN_MacteraCave,
+    WRN_RockInfestation,
+    WRN_BulletHell,
+    WRN_CaveLeechDen,
+    WRN_NoOxygen,
+    WRN_Plague,
+    WRN_ExploderInfestation,
+    WRN_Ghost,
+    WRN_LethalEnemies,
+    WRN_NoShields,
+    WRN_InfestedEnemies,
+    WRN_Swarmagedon,
+    WRN_RivalIncursion,
+}
+impl EMissionMutator {
+    pub fn is_banned_objective(self, obj: EObjective) -> bool {
+        match self {
+            EMissionMutator::MMUT_BloodSugar => [EObjective::OBJ_1st_Facility].as_slice(),
+            _ => &[],
+        }
+        .contains(&obj)
+    }
+}
+impl EMissionWarning {
+    pub fn is_banned_objective(self, obj: EObjective) -> bool {
+        match self {
+            EMissionWarning::WRN_Plague => [EObjective::OBJ_1st_Escort].as_slice(),
+            EMissionWarning::WRN_NoOxygen => [EObjective::OBJ_1st_Salvage].as_slice(),
+            EMissionWarning::WRN_CaveLeechDen => [
+                EObjective::OBJ_1st_PointExtraction,
+                EObjective::OBJ_1st_Facility,
+            ]
+            .as_slice(),
+            EMissionWarning::WRN_Ghost => [
+                EObjective::OBJ_1st_Salvage,
+                EObjective::OBJ_DD_Defense,
+                EObjective::OBJ_1st_Escort,
+                EObjective::OBJ_1st_Facility,
+                EObjective::OBJ_1st_DeepScan,
+            ]
+            .as_slice(),
+            EMissionWarning::WRN_RivalIncursion => {
+                [EObjective::OBJ_1st_Facility, EObjective::OBJ_1st_Escort].as_slice()
+            }
+            _ => &[],
+        }
+        .contains(&obj)
+    }
+    pub fn is_banned_mutator(self, mutator: EMissionMutator) -> bool {
+        match self {
+            EMissionWarning::WRN_NoOxygen => [EMissionMutator::MMUT_OxygenRich].as_slice(),
+            _ => &[],
+        }
+        .contains(&mutator)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
 pub enum ESeason {
     Season0,
     Season1,
@@ -479,6 +714,10 @@ pub struct UGeneratedMission {
     pub seed: u32,
     pub template: EMissionTemplate,
     pub biome: EBiome,
+    pub primary_objective: EObjective,
+    pub secondary_objectives: Vec<EObjective>,
+    pub mutators: Vec<EMissionMutator>,
+    pub warnings: Vec<EMissionWarning>,
     pub complexity_limit: Option<EMissionComplexity>,
     pub duration_limit: Option<EMissionDuration>,
 }
