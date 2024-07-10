@@ -53,9 +53,13 @@ impl SRand {
         let i = self.rand_helper(slice.len() as i32) as usize;
         &slice[i]
     }
-    fn rand_remove<'a, T>(&mut self, vec: &mut Vec<T>) -> T {
+    fn rand_swap_remove<'a, T>(&mut self, vec: &mut Vec<T>) -> T {
         let i = self.rand_helper(vec.len() as i32) as usize;
         vec.swap_remove(i)
+    }
+    fn rand_remove<'a, T>(&mut self, vec: &mut Vec<T>) -> T {
+        let i = self.rand_helper(vec.len() as i32) as usize;
+        vec.remove(i)
     }
 }
 
@@ -410,7 +414,7 @@ fn gen_deep_dive(
                 &secondary_objectives,
                 &mut rand,
             );
-            mutators.swap_remove(mutators.iter().rposition(|i| *i == r).unwrap());
+            mutators.swap_remove(mutators.iter().position(|i| *i == r).unwrap());
             mutator = Some(r)
         }
         if warning_indexes.contains(&i) {
@@ -421,7 +425,7 @@ fn gen_deep_dive(
                 &secondary_objectives,
                 &mut rand,
             );
-            warnings.swap_remove(warnings.iter().rposition(|i| *i == r).unwrap());
+            warnings.swap_remove(warnings.iter().position(|i| *i == r).unwrap());
             warning = Some(r)
         }
 
@@ -443,7 +447,17 @@ fn gen_deep_dive(
 
             let mut sum = 0.0;
             let mut rand = SRand(mission_seed);
-            rand.mutate(); // used once for secondary objective selection
+            {
+                // simulate normal secondary objective selection (result not used for DDs)
+                let mut secondaries = stage_template
+                    .0
+                    .get()
+                    .mission_template
+                    .secondary_objectives
+                    .to_vec();
+                while (rand.rand_remove(&mut secondaries)).is_banned_in_biome(biome) {}
+            }
+
             let select = rand.get_fraction() * total;
 
             **possible_dna
@@ -489,13 +503,13 @@ fn gen_deep_dive_pair(seed: u32) -> (UDeepDive, UDeepDive) {
     let normal = gen_deep_dive(
         get_normal_template(),
         deep_dive_seed ^ 0x929,
-        rand.rand_remove(&mut biomes),
+        rand.rand_swap_remove(&mut biomes),
         &mut used_missions,
     );
     let hard = gen_deep_dive(
         get_hard_template(),
         deep_dive_seed ^ 0x1300,
-        rand.rand_remove(&mut biomes),
+        rand.rand_swap_remove(&mut biomes),
         &mut used_missions,
     );
     (normal, hard)

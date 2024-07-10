@@ -181,6 +181,7 @@ pub struct FMissionTemplateItem {
 #[derive(Debug)]
 pub struct UMissionTemplate {
     pub primary_objective: EObjective,
+    pub secondary_objectives: &'static [EObjective],
     pub deep_dive_objectives: &'static [EObjective],
     pub dna: &'static [EMissionDNA],
 }
@@ -202,6 +203,17 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_Extraction => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_1st_Extraction,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_KillFleas,
+                        EObjective::OBJ_2nd_Find_Gunkseed,
+                        EObjective::OBJ_2nd_Find_Ebonut,
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_DestroyBhaBarnacles,
+                        EObjective::OBJ_2nd_DestroyEggs,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_AlienEggs,
                         EObjective::OBJ_DD_Elimination_Eggs,
@@ -223,6 +235,18 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_Motherlode => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_1st_PointExtraction,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                        EObjective::OBJ_2nd_Find_Gunkseed,
+                        EObjective::OBJ_2nd_Find_Ebonut,
+                        EObjective::OBJ_2nd_KillFleas,
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_Mine_Dystrum,
+                        EObjective::OBJ_2nd_DestroyBhaBarnacles,
+                        EObjective::OBJ_2nd_DestroyEggs,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_AlienEggs,
                         EObjective::OBJ_DD_Morkite,
@@ -241,6 +265,17 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_EggCollection => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_1st_Gather_AlienEggs,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                        EObjective::OBJ_2nd_KillFleas,
+                        EObjective::OBJ_2nd_Find_Gunkseed,
+                        EObjective::OBJ_2nd_Find_Ebonut,
+                        EObjective::OBJ_2nd_DestroyBhaBarnacles,
+                        EObjective::OBJ_2nd_DestroyEggs,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_Morkite,
                         EObjective::OBJ_DD_Elimination_Eggs,
@@ -260,6 +295,17 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_Elimination => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_Eliminate_Eggs,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_KillFleas,
+                        EObjective::OBJ_2nd_Find_Gunkseed,
+                        EObjective::OBJ_2nd_Find_Ebonut,
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                        EObjective::OBJ_2nd_DestroyBhaBarnacles,
+                        EObjective::OBJ_2nd_DestroyEggs,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_AlienEggs,
                         EObjective::OBJ_DD_Morkite,
@@ -275,6 +321,17 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_Salvage => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_1st_Salvage,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_KillFleas,
+                        EObjective::OBJ_2nd_Find_Gunkseed,
+                        EObjective::OBJ_2nd_Find_Ebonut,
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                        EObjective::OBJ_2nd_DestroyBhaBarnacles,
+                        EObjective::OBJ_2nd_DestroyEggs,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_AlienEggs,
                         EObjective::OBJ_DD_Morkite,
@@ -292,6 +349,17 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_Escort => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_1st_Escort,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                        EObjective::OBJ_2nd_Find_Gunkseed,
+                        EObjective::OBJ_2nd_Find_Ebonut,
+                        EObjective::OBJ_2nd_KillFleas,
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_DestroyBhaBarnacles,
+                        EObjective::OBJ_2nd_DestroyEggs,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_AlienEggs,
                         EObjective::OBJ_DD_Morkite,
@@ -311,6 +379,18 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_Refinery => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_1st_Refinery,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                        EObjective::OBJ_2nd_Find_Gunkseed,
+                        EObjective::OBJ_2nd_Find_Ebonut,
+                        EObjective::OBJ_2nd_KillFleas,
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_Mine_Dystrum,
+                        EObjective::OBJ_2nd_DestroyBhaBarnacles,
+                        EObjective::OBJ_2nd_DestroyEggs,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_AlienEggs,
                         EObjective::OBJ_DD_Morkite,
@@ -328,6 +408,12 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_Facility => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_1st_Facility,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_AlienEggs,
                         EObjective::OBJ_DD_Morkite,
@@ -346,6 +432,17 @@ impl EMissionTemplate {
             EMissionTemplate::MissionType_DeepScan => &FMissionTemplateItem {
                 mission_template: UMissionTemplate {
                     primary_objective: EObjective::OBJ_1st_DeepScan,
+                    secondary_objectives: &[
+                        EObjective::OBJ_2nd_Find_ApocaBloom,
+                        EObjective::OBJ_2nd_Find_BooloCap,
+                        EObjective::OBJ_2nd_Find_Fossil,
+                        EObjective::OBJ_2nd_Mine_Hollomite,
+                        EObjective::OBJ_2nd_KillFleas,
+                        EObjective::OBJ_2nd_Find_Gunkseed,
+                        EObjective::OBJ_2nd_Find_Ebonut,
+                        EObjective::OBJ_2nd_DestroyBhaBarnacles,
+                        EObjective::OBJ_2nd_DestroyEggs,
+                    ],
                     deep_dive_objectives: &[
                         EObjective::OBJ_DD_Morkite,
                         EObjective::OBJ_DD_Elimination_Eggs,
@@ -937,6 +1034,18 @@ pub enum EMissionWarning {
     WRN_Swarmagedon,
     WRN_RivalIncursion,
 }
+impl EObjective {
+    pub fn is_banned_in_biome(self, biome: EBiome) -> bool {
+        match self {
+            EObjective::OBJ_2nd_DestroyEggs => {
+                [EBiome::BIOME_FungusBogs, EBiome::BIOME_AzureWeald].as_slice()
+            }
+            EObjective::OBJ_2nd_Mine_Dystrum => [EBiome::BIOME_AzureWeald].as_slice(),
+            _ => &[],
+        }
+        .contains(&biome)
+    }
+}
 impl EMissionMutator {
     pub fn is_banned_objective(self, obj: EObjective) -> bool {
         match self {
@@ -980,6 +1089,9 @@ impl EMissionWarning {
     pub fn is_banned_mutator(self, mutator: EMissionMutator) -> bool {
         match self {
             EMissionWarning::WRN_NoOxygen => [EMissionMutator::MMUT_OxygenRich].as_slice(),
+            EMissionWarning::WRN_InfestedEnemies => {
+                [EMissionMutator::MMUT_ExplosiveEnemies].as_slice()
+            }
             _ => &[],
         }
         .contains(&mutator)
