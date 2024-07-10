@@ -21,6 +21,7 @@ DD = UDeepDive {
             duration_limit: Some(
                 MD_Duration_Normal,
             ),
+            dna: DNA_Fractured_Medium,
         },
         UGeneratedMission {
             seed: 2311042610,
@@ -35,7 +36,10 @@ DD = UDeepDive {
                 WRN_LethalEnemies,
             ],
             complexity_limit: None,
-            duration_limit: None,
+            duration_limit: Some(
+                MD_Duration_Normal,
+            ),
+            dna: DNA_Motherlode_Short,
         },
         UGeneratedMission {
             seed: 3720193574,
@@ -53,6 +57,7 @@ DD = UDeepDive {
             duration_limit: Some(
                 MD_Duration_Short,
             ),
+            dna: DNA_FracturedSimple,
         },
     ],
 }
@@ -76,6 +81,7 @@ EDD = UDeepDive {
             duration_limit: Some(
                 MD_Duration_Normal,
             ),
+            dna: DNA_2_02,
         },
         UGeneratedMission {
             seed: 2392698723,
@@ -93,6 +99,7 @@ EDD = UDeepDive {
             duration_limit: Some(
                 MD_Duration_Short,
             ),
+            dna: DNA_FracturedSimple,
         },
         UGeneratedMission {
             seed: 4106333831,
@@ -110,6 +117,7 @@ EDD = UDeepDive {
             duration_limit: Some(
                 MD_Duration_Normal,
             ),
+            dna: DNA_Star_Medium,
         },
     ],
 }

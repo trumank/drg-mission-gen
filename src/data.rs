@@ -181,8 +181,8 @@ pub struct FMissionTemplateItem {
 pub struct UMissionTemplate {
     pub primary_objective: EObjective,
     pub deep_dive_objectives: &'static [EObjective],
+    pub dna: &'static [EMissionDNA],
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
 pub enum EMissionTemplate {
     MissionType_Extraction,
@@ -209,6 +209,13 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_DeepScan,
                         EObjective::OBJ_DD_MorkiteWell,
                     ],
+                    dna: &[
+                        EMissionDNA::DNA_2_01,
+                        EMissionDNA::DNA_2_02,
+                        EMissionDNA::DNA_2_03,
+                        EMissionDNA::DNA_2_04,
+                        EMissionDNA::DNA_2_05,
+                    ],
                 },
                 rarity: 1.0,
             },
@@ -222,6 +229,10 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_Defense,
                         EObjective::OBJ_DD_DeepScan,
                         EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                    dna: &[
+                        EMissionDNA::DNA_Motherlode_Long,
+                        EMissionDNA::DNA_Motherlode_Short,
                     ],
                 },
                 rarity: 0.5,
@@ -237,6 +248,11 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_DeepScan,
                         EObjective::OBJ_DD_MorkiteWell,
                     ],
+                    dna: &[
+                        EMissionDNA::DNA_Fractured_Medium,
+                        EMissionDNA::DNA_FracturedSimple,
+                        EMissionDNA::DNA_Fractured_Complex,
+                    ],
                 },
                 rarity: 0.5,
             },
@@ -251,6 +267,7 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_DeepScan,
                         EObjective::OBJ_DD_MorkiteWell,
                     ],
+                    dna: &[EMissionDNA::DNA_Star_Complex, EMissionDNA::DNA_Star_Medium],
                 },
                 rarity: 0.5,
             },
@@ -263,6 +280,10 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_Elimination_Eggs,
                         EObjective::OBJ_DD_DeepScan,
                         EObjective::OBJ_DD_MorkiteWell,
+                    ],
+                    dna: &[
+                        EMissionDNA::DNA_SalvageFractured_Complex,
+                        EMissionDNA::DNA_SalvageFractured_Medium,
                     ],
                 },
                 rarity: 0.5,
@@ -277,6 +298,12 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_DeepScan,
                         EObjective::OBJ_DD_MorkiteWell,
                     ],
+                    dna: &[
+                        EMissionDNA::DNA_Escort_MediumAverage,
+                        EMissionDNA::DNA_Escort_MediumComplex,
+                        EMissionDNA::DNA_Escort_LongAverage,
+                        EMissionDNA::DNA_Escort_LongComplex,
+                    ],
                 },
                 rarity: 0.5,
             },
@@ -289,6 +316,10 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_Elimination_Eggs,
                         EObjective::OBJ_DD_Defense,
                         EObjective::OBJ_DD_DeepScan,
+                    ],
+                    dna: &[
+                        EMissionDNA::DNA_Refinery_Medium,
+                        EMissionDNA::DNA_Refinery_Complex,
                     ],
                 },
                 rarity: 0.5,
@@ -304,6 +335,10 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_DeepScan,
                         EObjective::OBJ_DD_MorkiteWell,
                     ],
+                    dna: &[
+                        EMissionDNA::DNA_Facility_Simple,
+                        EMissionDNA::DNA_Facility_Average,
+                    ],
                 },
                 rarity: 0.0,
             },
@@ -318,6 +353,7 @@ impl EMissionTemplate {
                         EObjective::OBJ_DD_AlienEggs,
                         EObjective::OBJ_DD_MorkiteWell,
                     ],
+                    dna: &[EMissionDNA::DNA_Web_Small, EMissionDNA::DNA_Web_Medium],
                 },
                 rarity: 1.0,
             },
@@ -341,6 +377,186 @@ pub enum EMissionDuration {
     MD_Duration_Long,
     MD_Duration_Normal,
     MD_Duration_Short,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+pub enum EMissionDNA {
+    DNA_2_01,
+    DNA_2_02,
+    DNA_2_03,
+    DNA_2_04,
+    DNA_2_05,
+    DNA_Escort_LongAverage,
+    DNA_Escort_LongComplex,
+    DNA_Escort_MediumAverage,
+    DNA_Escort_MediumComplex,
+    DNA_Facility_Average,
+    DNA_Facility_DNA,
+    DNA_Facility_Simple,
+    DNA_FracturedSimple,
+    DNA_Fractured_Complex,
+    DNA_Fractured_Medium,
+    DNA_Motherlode_Long,
+    DNA_Motherlode_Short,
+    DNA_Refinery_Complex,
+    DNA_Refinery_Medium,
+    DNA_SalvageFractured_Complex,
+    DNA_SalvageFractured_Medium,
+    DNA_Star_Complex,
+    DNA_Star_Medium,
+    DNA_Tutorial,
+    DNA_Web_Large,
+    DNA_Web_Medium,
+    DNA_Web_Small,
+}
+
+#[derive(Debug)]
+pub struct UMissionDNA {
+    pub duration: EMissionDuration,
+    pub complexity: EMissionComplexity,
+    pub weight: f32,
+}
+
+impl EMissionDNA {
+    pub fn get(self) -> &'static UMissionDNA {
+        match self {
+            EMissionDNA::DNA_2_01 => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Short,
+                complexity: EMissionComplexity::MD_Complexity_Simple,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_2_02 => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.5,
+            },
+            EMissionDNA::DNA_2_03 => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Simple,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_2_04 => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Long,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.5,
+            },
+            EMissionDNA::DNA_2_05 => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Long,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Escort_LongAverage => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Long,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Escort_LongComplex => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Long,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Escort_MediumAverage => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Escort_MediumComplex => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Facility_Average => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Facility_DNA => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Facility_Simple => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Simple,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_FracturedSimple => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Short,
+                complexity: EMissionComplexity::MD_Complexity_Simple,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Fractured_Complex => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Long,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.5,
+            },
+            EMissionDNA::DNA_Fractured_Medium => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.5,
+            },
+            EMissionDNA::DNA_Motherlode_Long => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Long,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 1.5,
+            },
+            EMissionDNA::DNA_Motherlode_Short => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Refinery_Complex => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Refinery_Medium => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_SalvageFractured_Complex => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Long,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 1.5,
+            },
+            EMissionDNA::DNA_SalvageFractured_Medium => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Star_Complex => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Long,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 2.0,
+            },
+            EMissionDNA::DNA_Star_Medium => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Tutorial => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Short,
+                complexity: EMissionComplexity::MD_Complexity_Simple,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Web_Large => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Complex,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Web_Medium => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Normal,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+            EMissionDNA::DNA_Web_Small => &UMissionDNA {
+                duration: EMissionDuration::MD_Duration_Short,
+                complexity: EMissionComplexity::MD_Complexity_Average,
+                weight: 1.0,
+            },
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -509,7 +725,7 @@ pub fn get_normal_template() -> &'static UDeepDiveTemplate {
             FDeepDiveTemplateItem {
                 mission: EMissionTemplate::MissionType_Motherlode,
                 probability: 10,
-                allowed_durations: &[],
+                allowed_durations: &[EMissionDuration::MD_Duration_Normal],
                 allowed_complexities: &[],
                 can_only_appear_once: false,
                 can_only_appear_once_per_deep_dive_set: false,
@@ -541,8 +757,8 @@ pub fn get_normal_template() -> &'static UDeepDiveTemplate {
             FDeepDiveTemplateItem {
                 mission: EMissionTemplate::MissionType_DeepScan,
                 probability: 10,
-                allowed_durations: &[],
-                allowed_complexities: &[],
+                allowed_durations: &[EMissionDuration::MD_Duration_Short],
+                allowed_complexities: &[EMissionComplexity::MD_Complexity_Average],
                 can_only_appear_once: false,
                 can_only_appear_once_per_deep_dive_set: false,
             },
@@ -828,6 +1044,7 @@ pub struct UGeneratedMission {
     pub warnings: Vec<EMissionWarning>,
     pub complexity_limit: Option<EMissionComplexity>,
     pub duration_limit: Option<EMissionDuration>,
+    pub dna: EMissionDNA,
 }
 
 #[derive(Debug)]

@@ -430,6 +430,31 @@ fn gen_deep_dive(
             rand.mutate();
         }
 
+        let dna = {
+            let mut possible_dna = vec![];
+            for dna in stage_template.0.get().mission_template.dna {
+                if stage_template.2.is_none() || stage_template.2 == Some(dna.get().complexity) {
+                    if stage_template.1.is_none() || stage_template.1 == Some(dna.get().duration) {
+                        possible_dna.push(dna);
+                    }
+                }
+            }
+            let total: f32 = possible_dna.iter().map(|d| d.get().weight).sum();
+
+            let mut sum = 0.0;
+            let mut rand = SRand(mission_seed);
+            rand.mutate(); // used once for secondary objective selection
+            let select = rand.get_fraction() * total;
+
+            **possible_dna
+                .iter()
+                .find(|d| {
+                    sum += d.get().weight;
+                    sum >= select
+                })
+                .unwrap()
+        };
+
         let stage = UGeneratedMission {
             seed: mission_seed,
             template: stage_template.0,
@@ -440,6 +465,7 @@ fn gen_deep_dive(
             mutators: mutator.into_iter().collect(),
             complexity_limit: stage_template.2,
             duration_limit: stage_template.1,
+            dna,
         };
 
         stages.push(stage);
