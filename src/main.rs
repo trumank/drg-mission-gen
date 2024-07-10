@@ -503,6 +503,8 @@ fn gen_deep_dive_pair(seed: u32) -> (UDeepDive, UDeepDive) {
 
 #[cfg(test)]
 mod test {
+    use serde::Deserialize;
+
     use super::*;
 
     #[test]
@@ -591,5 +593,28 @@ mod test {
             ^ (minute / 30))
             % 100000;
         dbg!(seed);
+    }
+
+    #[test]
+    fn compare_dds() {
+        #[derive(Debug, Deserialize)]
+        struct DD {
+            missions: Vec<UGeneratedMission>,
+        }
+        #[derive(Debug, Deserialize)]
+        struct DDPair {
+            seed: u32,
+            normal: DD,
+            hard: DD,
+        }
+        let dds: Vec<DDPair> = serde_json::from_slice(&std::fs::read("dds.json").unwrap()).unwrap();
+        //println!("{:#?}", dds);
+
+        for dd in dds {
+            let (normal, hard) = gen_deep_dive_pair(dd.seed);
+            println!("seed = {}", dd.seed);
+            pretty_assertions::assert_eq!(dd.normal.missions, normal.missions, "normal");
+            pretty_assertions::assert_eq!(dd.hard.missions, hard.missions, "hard");
+        }
     }
 }

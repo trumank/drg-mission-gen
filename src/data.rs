@@ -1,8 +1,9 @@
+use serde::{Deserialize, Serialize};
 use strum::VariantArray;
 
 pub type TArray<T> = Vec<T>;
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EPlanetZone {
     PZ_Zone01,
     PZ_Zone02,
@@ -76,7 +77,7 @@ impl EPlanetZone {
             EPlanetZone::PZ_Zone04 => &UPlanetZone {
                 biomes: &[
                     EBiome::BIOME_MagmaCaves,
-                    EBiome::BIOME_SandblastedCorridoors,
+                    EBiome::BIOME_SandblastedCorridors,
                     EBiome::BIOME_AzureWeald,
                 ],
                 required_missions: &[
@@ -104,14 +105,14 @@ impl EPlanetZone {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EBiome {
     BIOME_CrystalCaves,
     BIOME_FungusBogs,
     BIOME_MagmaCaves,
     BIOME_RadioactiveZone,
     BIOME_LushDownpour,
-    BIOME_SandblastedCorridoors,
+    BIOME_SandblastedCorridors,
     BIOME_SaltCaves,
     BIOME_IceCaves,
     BIOME_AzureWeald,
@@ -135,7 +136,7 @@ impl EBiome {
             EBiome::BIOME_LushDownpour => &UBiome {
                 planet_zone_selection_weight: 1.0,
             },
-            EBiome::BIOME_SandblastedCorridoors => &UBiome {
+            EBiome::BIOME_SandblastedCorridors => &UBiome {
                 planet_zone_selection_weight: 1.0,
             },
             EBiome::BIOME_SaltCaves => &UBiome {
@@ -183,7 +184,7 @@ pub struct UMissionTemplate {
     pub deep_dive_objectives: &'static [EObjective],
     pub dna: &'static [EMissionDNA],
 }
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EMissionTemplate {
     MissionType_Extraction,
     MissionType_Motherlode,
@@ -363,7 +364,7 @@ impl EMissionTemplate {
 
 #[derive(Debug)]
 pub struct UMissionComplexity {}
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EMissionComplexity {
     MD_Complexity_Complex,
     MD_Complexity_Average,
@@ -372,14 +373,14 @@ pub enum EMissionComplexity {
 
 #[derive(Debug)]
 pub struct UMissionDuration {}
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EMissionDuration {
     MD_Duration_Long,
     MD_Duration_Normal,
     MD_Duration_Short,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EMissionDNA {
     DNA_2_01,
     DNA_2_02,
@@ -868,7 +869,7 @@ pub fn get_hard_template() -> &'static UDeepDiveTemplate {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EObjective {
     OBJ_1st_DeepScan,
     OBJ_1st_Escort,
@@ -904,7 +905,7 @@ pub enum EObjective {
     OBJ_WRN_Plague,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EMissionMutator {
     MMUT_ExplosiveEnemies,
     MMUT_ExterminationContract,
@@ -918,7 +919,7 @@ pub enum EMissionMutator {
     MMUT_LowGravity,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EMissionWarning {
     WRN_RegenerativeEnemies,
     WRN_HeroEnemies,
@@ -985,7 +986,7 @@ impl EMissionWarning {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum ESeason {
     Season0,
     Season1,
@@ -1033,7 +1034,7 @@ pub struct USeason {
     pub mission_map_event_zone_type: ESeasonMissionMapOverlayType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct UGeneratedMission {
     pub seed: u32,
     pub template: EMissionTemplate,
