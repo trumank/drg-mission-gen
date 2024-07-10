@@ -4,6 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-srand = "0.4.0"
 strum = { version = "0.26.3", features = ["derive"] }
 time = "0.3.36"
