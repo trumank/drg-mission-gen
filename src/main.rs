@@ -584,10 +584,10 @@ mod test {
         let hour = now.hour() as u32;
         let minute = now.minute() as u32;
 
-        let seed = ((year * 0x2a90af)
-            ^ (month * 0x4f9ffb7)
-            ^ (day * 0x73387)
-            ^ (hour * 0x5b53f5)
+        let seed = ((year.wrapping_mul(0x2a90af))
+            ^ (month.wrapping_mul(0x4f9ffb7))
+            ^ (day.wrapping_mul(0x73387))
+            ^ (hour.wrapping_mul(0x5b53f5))
             ^ (minute / 30))
             % 100000;
         dbg!(seed);
