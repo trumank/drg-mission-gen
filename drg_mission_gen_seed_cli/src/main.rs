@@ -1,4 +1,4 @@
-use mission_gen_core::gen_deep_dive_pair;
+use drg_mission_gen_core::gen_deep_dive_pair;
 
 fn main() {
     let (normal, hard) = gen_deep_dive_pair(

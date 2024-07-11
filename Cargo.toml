@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["mission_gen_core", "mission_gen_seed_cli"]
+members = ["drg_mission_gen_core", "drg_mission_gen_seed_cli"]
 
 [workspace.package]
 version = "0.1.0"
