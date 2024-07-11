@@ -2,10 +2,12 @@ mod data;
 mod rand;
 
 use data::{
-    get_hard_template, get_normal_template, EBiome, EMissionMutator, EMissionWarning, EObjective,
-    EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UDeepDive, UDeepDiveTemplate,
+    get_deep_dive_settings, get_hard_template, get_mission_setup, get_normal_template, EBiome,
+    EMissionComplexity, EMissionDuration, EMissionMutator, EMissionTemplate, EMissionWarning,
+    EObjective, EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UDeepDive, UDeepDiveTemplate,
     UGeneratedMission,
 };
+
 use rand::FRandomStream;
 use strum::VariantArray;
 
@@ -438,7 +440,7 @@ fn gen_deep_dive(
     }
 }
 
-fn gen_deep_dive_pair(seed: u32) -> (UDeepDive, UDeepDive) {
+pub fn gen_deep_dive_pair(seed: u32) -> (UDeepDive, UDeepDive) {
     let deep_dive_seed = seed & 0x1ffff;
 
     let mut rand = FRandomStream::new(deep_dive_seed);
@@ -545,7 +547,8 @@ mod test {
             normal: DD,
             hard: DD,
         }
-        let dds: Vec<DDPair> = serde_json::from_slice(&std::fs::read("dds.json").unwrap()).unwrap();
+        let dds: Vec<DDPair> =
+            serde_json::from_slice(&std::fs::read("test_data/dds.json").unwrap()).unwrap();
         //println!("{:#?}", dds);
 
         for dd in dds {
