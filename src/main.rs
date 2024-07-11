@@ -1,10 +1,12 @@
 mod data;
+mod rand;
 
 use data::{
     get_hard_template, get_normal_template, EBiome, EMissionMutator, EMissionWarning, EObjective,
     EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UDeepDive, UDeepDiveTemplate,
     UGeneratedMission,
 };
+use rand::FRandomStream;
 use strum::VariantArray;
 
 use crate::data::{
@@ -21,49 +23,7 @@ fn main() {
     println!("EDD = {hard:#?}");
 }
 
-struct SRand(u32);
-
-impl SRand {
-    fn next_seed(&self) -> u32 {
-        self.0.wrapping_mul(0xbb38435).wrapping_add(0x3619636b)
-    }
-    fn mutate(&mut self) {
-        self.0 = self.next_seed();
-        //println!("MUTATE SEED {}", self.0);
-    }
-    fn get_fraction(&mut self) -> f32 {
-        self.mutate();
-        f32::from_bits(0x3f800000 | self.0 as u32 >> 9) - 1.0
-    }
-    fn get_unsigned_int(&mut self) -> u32 {
-        //self.mutate();
-        self.0
-    }
-    fn rand_helper(&mut self, max: i32) -> i32 {
-        if max > 0 {
-            (self.get_fraction() * (max as f32)) as i32
-        } else {
-            0
-        }
-    }
-    fn rand_range(&mut self, min: i32, max: i32) -> i32 {
-        min + self.rand_helper(max - min + 1)
-    }
-    fn rand_item<'a, T>(&mut self, slice: &'a [T]) -> &'a T {
-        let i = self.rand_helper(slice.len() as i32) as usize;
-        &slice[i]
-    }
-    fn rand_swap_remove<'a, T>(&mut self, vec: &mut Vec<T>) -> T {
-        let i = self.rand_helper(vec.len() as i32) as usize;
-        vec.swap_remove(i)
-    }
-    fn rand_remove<'a, T>(&mut self, vec: &mut Vec<T>) -> T {
-        let i = self.rand_helper(vec.len() as i32) as usize;
-        vec.remove(i)
-    }
-}
-
-fn sample_zones(rand: &mut SRand, zone: EPlanetZone) -> data::EBiome {
+fn sample_zones(rand: &mut FRandomStream, zone: EPlanetZone) -> data::EBiome {
     let total: f32 = zone
         .get()
         .biomes
@@ -85,7 +45,7 @@ fn sample_zones(rand: &mut SRand, zone: EPlanetZone) -> data::EBiome {
         .unwrap()
 }
 
-fn sample_rand_interval(rand: &mut SRand, interval: &FRandInterval) -> i32 {
+fn sample_rand_interval(rand: &mut FRandomStream, interval: &FRandInterval) -> i32 {
     let total: f32 = interval.intervals.iter().map(|b| b.weight).sum();
 
     let mut sum = 0.0;
@@ -110,7 +70,7 @@ struct FPlanetZoneItem {
     picked_MAYBE: bool,
 }
 
-fn init_helpers(rand: &mut SRand) -> Vec<FPlanetZoneItem> {
+fn init_helpers(rand: &mut FRandomStream) -> Vec<FPlanetZoneItem> {
     let mut helpers = vec![];
     for zone in data::EPlanetZone::VARIANTS {
         helpers.push(FPlanetZoneItem {
@@ -124,7 +84,7 @@ fn init_helpers(rand: &mut SRand) -> Vec<FPlanetZoneItem> {
     helpers
 }
 
-fn shuffle<T>(rand: &mut SRand, vec: &mut Vec<T>) {
+fn shuffle<T>(rand: &mut FRandomStream, vec: &mut Vec<T>) {
     for i in 0..vec.len() {
         //println!("SEED = {:X}", rand.0);
         let swap_index = rand.rand_helper(vec.len() as i32) as usize;
@@ -133,7 +93,7 @@ fn shuffle<T>(rand: &mut SRand, vec: &mut Vec<T>) {
     }
 }
 
-fn randomly_shrink<T>(rand: &mut SRand, size: usize, vec: &mut Vec<T>) {
+fn randomly_shrink<T>(rand: &mut FRandomStream, size: usize, vec: &mut Vec<T>) {
     while vec.len() > size {
         vec.swap_remove(rand.rand_helper(vec.len() as i32) as usize);
     }
@@ -147,7 +107,7 @@ struct FGlobalMissionSeed {
 }
 
 fn get_missions(seed: &FGlobalMissionSeed) {
-    let mut rand = SRand(seed.random_seed as u32);
+    let mut rand = FRandomStream::new(seed.random_seed as u32);
     let season = data::ESeason::from_index(seed.season as usize);
 
     let mut helpers = init_helpers(&mut rand);
@@ -163,12 +123,12 @@ fn get_missions(seed: &FGlobalMissionSeed) {
     };
 
     rand.mutate(); // TODO unused?
-    let saved = rand.0; // surely there is some logical explanation here... forking rand stream?
+    let saved = rand.seed(); // surely there is some logical explanation here... forking rand stream?
     let rand_helper = (rand.get_fraction() * helpers.len() as f32) as usize;
-    rand.0 = saved;
+    rand.sed_seed(saved);
     dbg!(rand_helper);
 
-    println!("{:X}", rand.0);
+    println!("{:X}", rand.seed());
     dbg!(extra_biomes);
 
     match season.get().mission_map_event_zone_type {
@@ -216,7 +176,7 @@ fn deep_dive_get_mission(
     templates: &[FDeepDiveTemplateItem],
     used_missions: &mut Vec<EMissionTemplate>,
     existing_missions: &[UGeneratedMission],
-    rand: &mut SRand,
+    rand: &mut FRandomStream,
 ) -> (
     EMissionTemplate,
     Option<EMissionDuration>,
@@ -314,7 +274,7 @@ fn select_mutator(
     mutators: &[EMissionMutator],
     primary_objective: EObjective,
     secondary_objectives: &[EObjective],
-    rand: &mut SRand,
+    rand: &mut FRandomStream,
 ) -> EMissionMutator {
     let mut pool = mutators.to_vec();
     let mut i = pool.len() - 1;
@@ -342,7 +302,7 @@ fn select_warning(
     mutator: Option<EMissionMutator>,
     primary_objective: EObjective,
     secondary_objectives: &[EObjective],
-    rand: &mut SRand,
+    rand: &mut FRandomStream,
 ) -> EMissionWarning {
     let mut pool = warnings.to_vec();
     let mut i = pool.len() - 1;
@@ -373,7 +333,7 @@ fn gen_deep_dive(
     biome: EBiome,
     used_missions: &mut Vec<EMissionTemplate>,
 ) -> UDeepDive {
-    let mut rand = SRand(seed);
+    let mut rand = FRandomStream::new(seed);
     let first = rand.rand_item(data::names_first());
     let last = rand.rand_item(data::names_last());
     let name = format!("{first} {last}");
@@ -397,8 +357,8 @@ fn gen_deep_dive(
             deep_dive_get_mission(template.missions, used_missions, &stages, &mut rand);
 
         rand.mutate();
-        let mission_seed = rand.0;
-        let mut mission_rand = SRand(mission_seed);
+        let mission_seed = rand.seed();
+        let mut mission_rand = FRandomStream::new(mission_seed);
         let mission_template = &stage_template.0.get().mission_template;
         let primary_objective = mission_template.primary_objective;
         let secondary_objectives =
@@ -446,7 +406,7 @@ fn gen_deep_dive(
             let total: f32 = possible_dna.iter().map(|d| d.get().weight).sum();
 
             let mut sum = 0.0;
-            let mut rand = SRand(mission_seed);
+            let mut rand = FRandomStream::new(mission_seed);
             {
                 // simulate normal secondary objective selection (result not used for DDs)
                 let mut secondaries = stage_template
@@ -495,7 +455,7 @@ fn gen_deep_dive(
 fn gen_deep_dive_pair(seed: u32) -> (UDeepDive, UDeepDive) {
     let deep_dive_seed = seed & 0x1ffff;
 
-    let mut rand = SRand(deep_dive_seed);
+    let mut rand = FRandomStream::new(deep_dive_seed);
     let mut biomes = data::EBiome::VARIANTS.to_vec();
 
     let mut used_missions = vec![];
@@ -547,7 +507,7 @@ mod test {
 
     #[test]
     fn test_rand2() {
-        let mut rand = SRand(0x3FC2580F);
+        let mut rand = FRandomStream::new(0x3FC2580F);
         for i in 0..4 {
             rand.mutate();
             println!("next = {:X}", rand.next_seed());

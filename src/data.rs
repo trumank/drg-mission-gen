@@ -663,7 +663,7 @@ pub struct FIRandRange {
     pub max: i32,
 }
 impl FIRandRange {
-    pub fn rand(&self, rand: &mut crate::SRand) -> i32 {
+    pub fn rand(&self, rand: &mut crate::FRandomStream) -> i32 {
         // TODO verify correctness
         rand.rand_range(self.min, self.max)
     }
