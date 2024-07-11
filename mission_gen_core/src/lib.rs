@@ -9,23 +9,6 @@ use data::{
 use rand::FRandomStream;
 use strum::VariantArray;
 
-use crate::data::{
-    get_deep_dive_settings, get_mission_setup, EMissionComplexity, EMissionDuration,
-    EMissionTemplate,
-};
-
-fn main() {
-    let (normal, hard) = gen_deep_dive_pair(
-        std::env::args()
-            .nth(1)
-            .expect("expected seed")
-            .parse()
-            .expect("failed to parse seed as number"),
-    );
-    println!("DD = {normal:#?}");
-    println!("EDD = {hard:#?}");
-}
-
 fn sample_zones(rand: &mut FRandomStream, zone: EPlanetZone) -> data::EBiome {
     let total: f32 = zone
         .get()
