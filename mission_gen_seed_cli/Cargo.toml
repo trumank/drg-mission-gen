@@ -1,8 +1,0 @@
-[package]
-name = "mission_gen_seed_cli"
-version.workspace = true
-license.workspace = true
-edition.workspace = true
-
-[dependencies]
-mission_gen_core = { path = "../mission_gen_core" }
