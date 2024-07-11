@@ -16,7 +16,10 @@ use crate::data::{
 
 fn main() {
     let (normal, hard) = gen_deep_dive_pair(
-        u32::from_str_radix(&std::env::args().nth(1).expect("expected seed"), 10)
+        std::env::args()
+            .nth(1)
+            .expect("expected seed")
+            .parse()
             .expect("failed to parse seed as number"),
     );
     println!("DD = {normal:#?}");
@@ -66,8 +69,8 @@ struct FPlanetZoneItem {
     biomes: Vec<data::EBiome>,
     missions: Vec<data::UGeneratedMission>,
     zone: &'static EPlanetZone,
-    plague_MAYBE: bool,
-    picked_MAYBE: bool,
+    plague_maybe: bool,
+    picked_maybe: bool,
 }
 
 fn init_helpers(rand: &mut FRandomStream) -> Vec<FPlanetZoneItem> {
@@ -77,14 +80,14 @@ fn init_helpers(rand: &mut FRandomStream) -> Vec<FPlanetZoneItem> {
             biomes: vec![sample_zones(rand, *zone)],
             missions: vec![],
             zone,
-            plague_MAYBE: false,
-            picked_MAYBE: false,
+            plague_maybe: false,
+            picked_maybe: false,
         })
     }
     helpers
 }
 
-fn shuffle<T>(rand: &mut FRandomStream, vec: &mut Vec<T>) {
+fn shuffle<T>(rand: &mut FRandomStream, vec: &mut [T]) {
     for i in 0..vec.len() {
         //println!("SEED = {:X}", rand.0);
         let swap_index = rand.rand_helper(vec.len() as i32) as usize;
@@ -135,7 +138,7 @@ fn get_missions(seed: &FGlobalMissionSeed) {
         data::ESeasonMissionMapOverlayType::None => {
             let pick = &mut helpers[rand_helper];
 
-            pick.picked_MAYBE = true;
+            pick.picked_maybe = true;
 
             for biome in pick.zone.get().biomes {
                 if extra_biomes <= 0 {
@@ -161,8 +164,8 @@ fn get_missions(seed: &FGlobalMissionSeed) {
     // TODO verify when global_missions.len() > zones
     let mut global_missions: Vec<_> = get_mission_setup()
         .global_required_missions
-        .into_iter()
-        .map(|m| Some(m))
+        .iter()
+        .map(Some)
         .chain(std::iter::repeat(None))
         .take(helpers.len())
         .collect();
@@ -397,10 +400,10 @@ fn gen_deep_dive(
         let dna = {
             let mut possible_dna = vec![];
             for dna in stage_template.0.get().mission_template.dna {
-                if stage_template.2.is_none() || stage_template.2 == Some(dna.get().complexity) {
-                    if stage_template.1.is_none() || stage_template.1 == Some(dna.get().duration) {
-                        possible_dna.push(dna);
-                    }
+                if (stage_template.2.is_none() || stage_template.2 == Some(dna.get().complexity))
+                    && (stage_template.1.is_none() || stage_template.1 == Some(dna.get().duration))
+                {
+                    possible_dna.push(dna);
                 }
             }
             let total: f32 = possible_dna.iter().map(|d| d.get().weight).sum();
@@ -490,28 +493,6 @@ mod test {
         };
 
         get_missions(&seed);
-    }
-
-    #[test]
-    fn test_rand1() {
-        let n = 111;
-        let mut u: u32 = 0;
-        let mut i: i32 = 0;
-        for _ in 0..n {
-            u = u.wrapping_mul(0xbb38435).wrapping_add(0x3619636b);
-            i = i.wrapping_mul(0xbb38435).wrapping_add(0x3619636b);
-            assert_eq!(u, i as u32);
-            println!("{i} {u}");
-        }
-    }
-
-    #[test]
-    fn test_rand2() {
-        let mut rand = FRandomStream::new(0x3FC2580F);
-        for i in 0..4 {
-            rand.mutate();
-            println!("next = {:X}", rand.next_seed());
-        }
     }
 
     #[test]
