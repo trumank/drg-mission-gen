@@ -27,8 +27,8 @@ pub enum Format {
     Json,
     /// Simple human-friendly table format.
     Plain,
-    /// Fancy version which uses Discord emojis available in the main DRG Discord server.
-    Fancy,
+    /// Discord version which uses Discord emojis available in the main DRG Discord server.
+    Discord,
 }
 
 pub fn main() -> anyhow::Result<()> {
@@ -67,12 +67,16 @@ pub fn main() -> anyhow::Result<()> {
 
     let formatted_deep_dive = match args.format {
         Format::Json => serde_json::to_string_pretty(&deep_dive_pair)?,
-        Format::Plain => {
-            formatters::format_plain(&deep_dive_pair, release_datetime, **expiration_datetime)
-        }
-        Format::Fancy => {
-            formatters::format_fancy(&deep_dive_pair, release_datetime, **expiration_datetime)
-        }
+        Format::Plain => formatters::plain::format_plain(
+            &deep_dive_pair,
+            release_datetime,
+            **expiration_datetime,
+        ),
+        Format::Discord => formatters::discord::format_discord(
+            &deep_dive_pair,
+            release_datetime,
+            **expiration_datetime,
+        ),
     };
 
     println!("{}", formatted_deep_dive);

@@ -1,31 +1,11 @@
 use tabled::settings::Style;
-use tabled::{Table, Tabled};
+use tabled::Table;
 use time::OffsetDateTime;
 
-use crate::cleaned_deep_dive::{DeepDive, Mission};
+use crate::cleaned_deep_dive::DeepDive;
 use crate::deep_dive_pair::DeepDivePair;
 
-#[derive(Tabled)]
-#[tabled(rename_all = "PascalCase")]
-struct Stage {
-    stage: usize,
-    primary: &'static str,
-    secondary: &'static str,
-    warning: &'static str,
-    mutator: &'static str,
-}
-
-fn mission_to_stage(i: usize, m: &Mission) -> Stage {
-    Stage {
-        stage: i + 1,
-        primary: m
-            .primary_objective
-            .display_detailed(m.complexity, m.duration),
-        secondary: m.secondary_objective.display(),
-        warning: m.warning.map(|w| w.display()).unwrap_or(""),
-        mutator: m.mutator.map(|mt| mt.display()).unwrap_or(""),
-    }
-}
+use super::mission_to_stage;
 
 pub(crate) fn format_plain(
     pair: &DeepDivePair,
@@ -81,14 +61,4 @@ fn format_plain_dd(dd: &DeepDive) -> String {
         String::new(),
     ]
     .join("\n")
-}
-
-pub(crate) fn format_fancy(
-    pair: &DeepDivePair,
-    start_datetime: OffsetDateTime,
-    end_datetime: OffsetDateTime,
-) -> String {
-    unimplemented!(
-        "this is intended to be the #deep-dive-discussion format, but is not yet implemented"
-    )
 }
