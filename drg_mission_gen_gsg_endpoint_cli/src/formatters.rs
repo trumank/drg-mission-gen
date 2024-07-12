@@ -86,5 +86,7 @@ pub(crate) fn format_fancy(
     start_datetime: OffsetDateTime,
     end_datetime: OffsetDateTime,
 ) -> String {
-    todo!()
+    unimplemented!(
+        "this is intended to be the #deep-dive-discussion format, but is not yet implemented"
+    )
 }
