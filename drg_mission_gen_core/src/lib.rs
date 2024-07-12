@@ -113,7 +113,7 @@ fn get_missions(seed: &FGlobalMissionSeed) {
     rand.mutate(); // TODO unused?
     let saved = rand.seed(); // surely there is some logical explanation here... forking rand stream?
     let rand_helper = (rand.get_fraction() * helpers.len() as f32) as usize;
-    rand.sed_seed(saved);
+    rand.set_seed(saved);
     dbg!(rand_helper);
 
     println!("{:X}", rand.seed());
