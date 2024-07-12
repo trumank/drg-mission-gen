@@ -1,20 +1,37 @@
 mod clean;
 mod cleaned_deep_dive;
+mod deep_dive_pair;
 mod deep_dive_response;
+mod formatters;
 mod gsg_endpoint;
 
 use anyhow::Context;
 use clap::Parser;
 use clean::clean_unreal_deep_dive;
+use deep_dive_pair::DeepDivePair;
 use drg_mission_gen_core::gen_deep_dive_pair;
 use tracing::*;
 
 use deep_dive_response::DeepDiveResponse;
 
 #[derive(Debug, Parser)]
-struct Args {}
+pub struct Args {
+    /// What do you want the output format to be.
+    #[clap(value_enum, default_value_t = Format::Json)]
+    #[arg(short, long)]
+    pub format: Format,
+}
 
-fn main() -> anyhow::Result<()> {
+#[derive(Debug, PartialEq, PartialOrd, Copy, Clone, clap::ValueEnum)]
+pub enum Format {
+    Json,
+    /// Simple human-friendly table format.
+    Plain,
+    /// Fancy version which uses Discord emojis available in the main DRG Discord server.
+    Fancy,
+}
+
+pub fn main() -> anyhow::Result<()> {
     drg_mission_gen_tracing::setup_logging();
 
     let ref deep_dive_response @ DeepDiveResponse {
@@ -41,6 +58,24 @@ fn main() -> anyhow::Result<()> {
     );
     debug!(?normal_deep_dive);
     debug!(?elite_deep_dive);
+    let deep_dive_pair = DeepDivePair {
+        normal: normal_deep_dive,
+        elite: elite_deep_dive,
+    };
+
+    let args = Args::parse();
+
+    let formatted_deep_dive = match args.format {
+        Format::Json => serde_json::to_string_pretty(&deep_dive_pair)?,
+        Format::Plain => {
+            formatters::format_plain(&deep_dive_pair, release_datetime, **expiration_datetime)
+        }
+        Format::Fancy => {
+            formatters::format_fancy(&deep_dive_pair, release_datetime, **expiration_datetime)
+        }
+    };
+
+    println!("{}", formatted_deep_dive);
 
     Ok(())
 }
