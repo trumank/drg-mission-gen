@@ -19,3 +19,4 @@ serde_json.workspace = true
 
 ureq = { version = "2", features = ["json"] }
 clap = { version = "4", features = ["derive"] }
+tabled = "0.15"
