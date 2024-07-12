@@ -4,8 +4,6 @@
 use serde::{Deserialize, Serialize};
 use strum::{IntoStaticStr, VariantArray};
 
-pub type TArray<T> = Vec<T>;
-
 #[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EPlanetZone {
     PZ_Zone01,
