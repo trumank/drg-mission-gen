@@ -18,7 +18,9 @@ struct Stage {
 fn mission_to_stage(i: usize, m: &Mission) -> Stage {
     Stage {
         stage: i + 1,
-        primary: m.primary_objective.display(),
+        primary: m
+            .primary_objective
+            .display_detailed(m.complexity, m.duration),
         secondary: m.secondary_objective.display(),
         warning: m.warning.map(|w| w.display()).unwrap_or(""),
         mutator: m.mutator.map(|mt| mt.display()).unwrap_or(""),

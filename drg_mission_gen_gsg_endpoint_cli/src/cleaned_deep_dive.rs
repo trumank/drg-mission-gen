@@ -2,6 +2,7 @@
 //! [`UDeepDive`][drg_mission_gen_core::UDeepDive] instances.
 
 use serde::{Deserialize, Serialize};
+use strum::IntoStaticStr;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub(crate) struct DeepDive {
@@ -75,6 +76,85 @@ impl PrimaryObjective {
             PrimaryObjective::PointExtraction => "Point Extraction",
             PrimaryObjective::Refinery => "On-Site Refinery",
             PrimaryObjective::Salvage => "Salvage Operation",
+        }
+    }
+
+    /// Reference: <https://deeprockgalactic.wiki.gg/wiki/Missions>.
+    pub(crate) fn display_detailed(
+        self,
+        complexity: Complexity,
+        duration: Duration,
+    ) -> &'static str {
+        match self {
+            PrimaryObjective::DeepScan => match (duration, complexity) {
+                (Duration::Short, Complexity::Average) => "Perform 3 Deep Scans",
+                (Duration::Normal, Complexity::Average) => "Perform 5 Deep Scans",
+                (dur, comp) => unreachable!(
+                    "unexpected deep scan duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                ),
+            },
+            PrimaryObjective::EscortDuty => match (duration, complexity) {
+                (Duration::Normal, Complexity::Average | Complexity::Complex) => "Escort Duty",
+                (dur, comp) => unreachable!(
+                    "unexpected escort duty duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                ),
+            },
+            PrimaryObjective::MiningExpedition => {
+                match (duration, complexity) {
+                    (Duration::Short, Complexity::Simple) => "200 Morkite",
+                    (Duration::Normal, Complexity::Simple) => "225 Morkite",
+                    (Duration::Normal, Complexity::Average) => "250 Morkite",
+                    (Duration::Long, Complexity::Average) => "325 Morkite",
+                    (Duration::Long, Complexity::Complex) => "400 Morkite",
+                    (dur, comp) => unreachable!(
+                        "unexpected escort duty duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                    ),
+                }
+            },
+            PrimaryObjective::IndustrialSabotage => {
+                match (duration, complexity) {
+                    (Duration::Short, Complexity::Simple | Complexity::Average) => "Industrial Sabotage",
+                    (dur, comp) => unreachable!(
+                        "unexpected industrial sabotage duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                    ),
+                }
+            },
+            PrimaryObjective::EggHunt => {
+                match (duration, complexity) {
+                    (Duration::Short, Complexity::Simple) => "4 Eggs",
+                    (Duration::Normal, Complexity::Average) => "6 Eggs",
+                    (Duration::Long, Complexity::Average) => "8 Eggs",
+                    (dur, comp) => unreachable!(
+                        "unexpected egg hunt duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                    ),
+                }
+            },
+            PrimaryObjective::PointExtraction => {
+                match (duration, complexity) {
+                    (Duration::Normal, Complexity::Complex) => "7 Aquarqs",
+                    (Duration::Long, Complexity::Simple) => "10 Aquarqs",
+                    (dur, comp) => unreachable!(
+                        "unexpected point extraction duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                    ),
+                }
+            },
+            PrimaryObjective::Refinery => {
+                match (duration, complexity) {
+                    (Duration::Normal, Complexity::Average | Complexity::Complex) => "On-Site Refinery",
+                    (dur, comp) => unreachable!(
+                        "unexpected refinery duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                    ),
+                }
+            },
+            PrimaryObjective::Salvage => {
+                match (duration, complexity) {
+                    (Duration::Normal, Complexity::Average) => "2 Mini-mules",
+                    (Duration::Long, Complexity::Complex) => "3 Mini-mules",
+                    (dur, comp) => unreachable!(
+                        "unexpected point extraction duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                    ),
+                }
+            },
         }
     }
 }
@@ -166,14 +246,14 @@ impl Warning {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize, IntoStaticStr)]
 pub(crate) enum Complexity {
     Simple,
     Average,
     Complex,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize, IntoStaticStr)]
 pub(crate) enum Duration {
     Short,
     Normal,
