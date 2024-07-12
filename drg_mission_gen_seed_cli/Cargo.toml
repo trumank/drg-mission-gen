@@ -1,7 +1,7 @@
 [package]
+name = "drg_mission_gen_seed_cli"
 edition.workspace = true
 license.workspace = true
-name = "drg_mission_gen_seed_cli"
 version.workspace = true
 
 [dependencies]

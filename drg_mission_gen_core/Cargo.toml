@@ -1,8 +1,8 @@
 [package]
 name = "drg_mission_gen_core"
+edition.workspace = true
 license.workspace = true
 version.workspace = true
-edition.workspace = true
 
 [dependencies]
 pretty_assertions = "1.4.0"
