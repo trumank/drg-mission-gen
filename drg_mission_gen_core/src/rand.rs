@@ -28,10 +28,7 @@ impl FRandomStream {
         self.mutate();
         f32::from_bits(0x3f800000 | self.seed >> 9) - 1.0
     }
-    pub fn get_unsigned_int(&mut self) -> u32 {
-        //self.mutate();
-        self.seed
-    }
+
     pub fn rand_helper(&mut self, max: i32) -> i32 {
         if max > 0 {
             (self.get_fraction() * (max as f32)) as i32
