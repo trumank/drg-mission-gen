@@ -5,7 +5,7 @@ use thiserror::Error;
 
 use drg_mission_gen_core::{
     EBiome, EMissionComplexity, EMissionDuration, EMissionMutator, EMissionWarning, EObjective,
-    UDeepDive, UGeneratedMission,
+    UDeepDive, UGeneratedMission, UMissionDNA,
 };
 
 use crate::cleaned_deep_dive::{
@@ -80,9 +80,15 @@ pub(crate) fn map_mission(mission: &UGeneratedMission) -> Result<Mission, CleanE
 
     // FIXME(jieyouxu): which complexity/duration takes precedence? are they guaranteed to be
     // self-consistent?
-    let mission_dna = mission.dna.get();
-    let complexity = map_complexity(&mission.complexity_limit.unwrap_or(mission_dna.complexity));
-    let duration = map_duration(&mission.duration_limit.unwrap_or(mission_dna.duration));
+    let UMissionDNA {
+        complexity,
+        duration,
+        ..
+    } = mission.dna.get();
+    // FIXME(jieyouxu): maybe we should just use `mission_dna`? or does (sometimes) available
+    // complexity/duration take precedence?
+    let complexity = map_complexity(&complexity);
+    let duration = map_duration(&duration);
 
     Ok(Mission {
         primary_objective,
