@@ -1,3 +1,6 @@
+#![allow(non_camel_case_types)]
+#![allow(clippy::enum_variant_names)]
+
 use serde::{Deserialize, Serialize};
 use strum::{IntoStaticStr, VariantArray};
 
