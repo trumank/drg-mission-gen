@@ -285,6 +285,7 @@ fn select_mutator(
 
     *rand.rand_item(&pool)
 }
+
 fn select_warning(
     warnings: &[EMissionWarning],
     mutator: Option<EMissionMutator>,

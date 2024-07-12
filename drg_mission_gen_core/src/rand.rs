@@ -10,6 +10,7 @@ impl FRandomStream {
             seed,
         }
     }
+
     pub fn seed(&self) -> u32 {
         self.seed
     }
@@ -17,13 +18,16 @@ impl FRandomStream {
     pub fn set_seed(&mut self, seed: u32) {
         self.seed = seed
     }
+
     pub fn next_seed(&self) -> u32 {
         self.seed.wrapping_mul(0xbb38435).wrapping_add(0x3619636b)
     }
+
     pub fn mutate(&mut self) {
         self.seed = self.next_seed();
         //println!("MUTATE SEED {}", self.0);
     }
+
     pub fn get_fraction(&mut self) -> f32 {
         self.mutate();
         f32::from_bits(0x3f800000 | self.seed >> 9) - 1.0
@@ -36,17 +40,21 @@ impl FRandomStream {
             0
         }
     }
+
     pub fn rand_range(&mut self, min: i32, max: i32) -> i32 {
         min + self.rand_helper(max - min + 1)
     }
+
     pub fn rand_item<'a, T>(&mut self, slice: &'a [T]) -> &'a T {
         let i = self.rand_helper(slice.len() as i32) as usize;
         &slice[i]
     }
+
     pub fn rand_swap_remove<T>(&mut self, vec: &mut Vec<T>) -> T {
         let i = self.rand_helper(vec.len() as i32) as usize;
         vec.swap_remove(i)
     }
+
     pub fn rand_remove<T>(&mut self, vec: &mut Vec<T>) -> T {
         let i = self.rand_helper(vec.len() as i32) as usize;
         vec.remove(i)

@@ -10,6 +10,7 @@ pub enum EPlanetZone {
     PZ_Zone03,
     PZ_Zone04,
 }
+
 impl EPlanetZone {
     pub fn get(&self) -> &'static UPlanetZone {
         match self {
@@ -118,6 +119,7 @@ pub enum EBiome {
     BIOME_AzureWeald,
     BIOME_HollowBough,
 }
+
 impl EBiome {
     pub fn get(&self) -> &'static UBiome {
         match self {
@@ -172,6 +174,7 @@ pub struct FRequiredMissionItem {
     pub duration: EMissionDuration,
     pub can_have_mutators: bool,
 }
+
 #[derive(Debug)]
 pub struct FMissionTemplateItem {
     pub mission_template: UMissionTemplate,
@@ -185,6 +188,7 @@ pub struct UMissionTemplate {
     pub deep_dive_objectives: &'static [EObjective],
     pub dna: &'static [EMissionDNA],
 }
+
 #[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
 pub enum EMissionTemplate {
     MissionType_Extraction,
@@ -197,6 +201,7 @@ pub enum EMissionTemplate {
     MissionType_Facility,
     MissionType_DeepScan,
 }
+
 impl EMissionTemplate {
     pub fn get(&self) -> &'static FMissionTemplateItem {
         match self {
@@ -662,6 +667,7 @@ pub struct FIRandRange {
     pub min: i32,
     pub max: i32,
 }
+
 impl FIRandRange {
     pub fn rand(&self, rand: &mut crate::FRandomStream) -> i32 {
         // TODO verify correctness
@@ -699,6 +705,7 @@ pub struct UDeepDiveSettings {
     pub mutators: &'static [EMissionMutator],
     pub warnings: &'static [EMissionWarning],
 }
+
 pub fn get_deep_dive_settings() -> &'static UDeepDiveSettings {
     &UDeepDiveSettings {
         mutators: &[
@@ -863,6 +870,7 @@ pub fn get_normal_template() -> &'static UDeepDiveTemplate {
         ],
     }
 }
+
 pub fn get_hard_template() -> &'static UDeepDiveTemplate {
     &UDeepDiveTemplate {
         mutator_count: FRandInterval {
@@ -1034,6 +1042,7 @@ pub enum EMissionWarning {
     WRN_Swarmagedon,
     WRN_RivalIncursion,
 }
+
 impl EObjective {
     pub fn is_banned_in_biome(self, biome: EBiome) -> bool {
         match self {
@@ -1046,6 +1055,7 @@ impl EObjective {
         .contains(&biome)
     }
 }
+
 impl EMissionMutator {
     pub fn is_banned_objective(self, obj: EObjective) -> bool {
         match self {
@@ -1055,6 +1065,7 @@ impl EMissionMutator {
         .contains(&obj)
     }
 }
+
 impl EMissionWarning {
     pub fn is_banned_objective(self, obj: EObjective) -> bool {
         match self {
@@ -1107,6 +1118,7 @@ pub enum ESeason {
     Season4,
     Season5,
 }
+
 impl ESeason {
     pub fn from_index(index: usize) -> Self {
         Self::VARIANTS[index]
