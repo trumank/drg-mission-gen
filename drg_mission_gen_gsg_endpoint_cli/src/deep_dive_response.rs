@@ -15,17 +15,18 @@ use time::{Duration, OffsetDateTime};
 /// {"Seed":165956950,"SeedV2":845016340,"ExpirationTime":"2024-07-18T11:00:00Z"}
 /// ```
 ///
-/// Note that I have seen negative integers and they seem to be accepted by the game fine.
+/// Note that I have seen negative integers and they seem to be accepted by the game fine (they are
+/// likely to be reinterpreted as [`u32`] internally anyways.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct DeepDiveResponse {
     /// This may be a legacy seed used in older game versions. Does not seem to affect newer deep
     /// dives. Consider this unused.
     #[serde(rename = "Seed")]
-    _seed: i64,
+    _seed: i32,
     /// This is the seed used to generate both deep dive missions, which is the seed we're
     /// interested in.
-    pub(crate) seed_v2: i64,
+    pub(crate) seed_v2: i32,
     /// When does the dive expire?
     #[serde(rename = "ExpirationTime")]
     pub(crate) expiration_datetime: ExpirationDateTime,

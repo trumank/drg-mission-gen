@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 drg_mission_gen_tracing = { path = "../drg_mission_gen_tracing" }
+drg_mission_gen_core = { path = "../drg_mission_gen_core" }
 
 tracing.workspace = true
 tracing-subscriber.workspace = true
@@ -17,3 +18,4 @@ serde.workspace = true
 serde_json.workspace = true
 
 ureq = { version = "2", features = ["json"] }
+clap = { version = "4", features = ["derive"] }
