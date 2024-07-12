@@ -3,6 +3,8 @@ resolver = "2"
 members = [
     "drg_mission_gen_core",
     "drg_mission_gen_seed_cli",
+    "drg_mission_gen_gsg_endpoint_cli",
+    "drg_mission_gen_tracing",
 ]
 
 [workspace.package]
