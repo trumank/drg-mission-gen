@@ -1,8 +1,15 @@
 [workspace]
 resolver = "2"
-members = ["drg_mission_gen_core", "drg_mission_gen_seed_cli"]
+members = [
+    "drg_mission_gen_core",
+    "drg_mission_gen_seed_cli",
+]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
+
+[workspace.dependencies]
+tracing = { version = "0.1", features = ["attributes"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "registry", "std"] }
