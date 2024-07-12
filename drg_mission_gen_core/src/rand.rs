@@ -13,7 +13,8 @@ impl FRandomStream {
     pub fn seed(&self) -> u32 {
         self.seed
     }
-    pub fn sed_seed(&mut self, seed: u32) {
+
+    pub fn set_seed(&mut self, seed: u32) {
         self.seed = seed
     }
     pub fn next_seed(&self) -> u32 {
