@@ -1,11 +1,13 @@
 mod data;
 mod rand;
 
-use data::{
-    get_deep_dive_settings, get_hard_template, get_mission_setup, get_normal_template, EBiome,
-    EMissionComplexity, EMissionDuration, EMissionMutator, EMissionTemplate, EMissionWarning,
-    EObjective, EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UDeepDive, UDeepDiveTemplate,
-    UGeneratedMission,
+use data::{get_deep_dive_settings, get_hard_template, get_mission_setup, get_normal_template};
+
+// Public re-exports.
+pub use data::{
+    EBiome, EMissionComplexity, EMissionDuration, EMissionMutator, EMissionTemplate,
+    EMissionWarning, EObjective, EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UDeepDive,
+    UDeepDiveTemplate, UGeneratedMission, UMissionDNA,
 };
 
 use rand::FRandomStream;

@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use strum::VariantArray;
+use strum::{IntoStaticStr, VariantArray};
 
 pub type TArray<T> = Vec<T>;
 
@@ -974,7 +974,7 @@ pub fn get_hard_template() -> &'static UDeepDiveTemplate {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize, IntoStaticStr)]
 pub enum EObjective {
     OBJ_1st_DeepScan,
     OBJ_1st_Escort,
@@ -1010,7 +1010,7 @@ pub enum EObjective {
     OBJ_WRN_Plague,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize, IntoStaticStr)]
 pub enum EMissionMutator {
     MMUT_ExplosiveEnemies,
     MMUT_ExterminationContract,
@@ -1024,7 +1024,7 @@ pub enum EMissionMutator {
     MMUT_LowGravity,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize, IntoStaticStr)]
 pub enum EMissionWarning {
     WRN_RegenerativeEnemies,
     WRN_HeroEnemies,
