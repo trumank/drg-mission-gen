@@ -23,10 +23,10 @@ pub(crate) struct DeepDiveResponse {
     /// This may be a legacy seed used in older game versions. Does not seem to affect newer deep
     /// dives. Consider this unused.
     #[serde(rename = "Seed")]
-    _seed: i32,
+    _seed: i64,
     /// This is the seed used to generate both deep dive missions, which is the seed we're
     /// interested in.
-    pub(crate) seed_v2: i32,
+    pub(crate) seed_v2: i64,
     /// When does the dive expire?
     #[serde(rename = "ExpirationTime")]
     pub(crate) expiration_datetime: ExpirationDateTime,

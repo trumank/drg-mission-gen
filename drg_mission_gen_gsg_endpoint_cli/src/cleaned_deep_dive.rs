@@ -132,7 +132,7 @@ impl PrimaryObjective {
             PrimaryObjective::PointExtraction => {
                 match (duration, complexity) {
                     (Duration::Normal, Complexity::Complex) => "7 Aquarqs",
-                    (Duration::Long, Complexity::Simple) => "10 Aquarqs",
+                    (Duration::Long, Complexity::Complex) => "10 Aquarqs",
                     (dur, comp) => unreachable!(
                         "unexpected point extraction duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                     ),
