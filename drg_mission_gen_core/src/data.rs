@@ -4,7 +4,9 @@
 use serde::{Deserialize, Serialize};
 use strum::{IntoStaticStr, VariantArray};
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, VariantArray, Serialize, Deserialize,
+)]
 pub enum EPlanetZone {
     PZ_Zone01,
     PZ_Zone02,
@@ -107,7 +109,9 @@ impl EPlanetZone {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, VariantArray, Serialize, Deserialize,
+)]
 pub enum EBiome {
     BIOME_CrystalCaves,
     BIOME_FungusBogs,
@@ -190,7 +194,9 @@ pub struct UMissionTemplate {
     pub dna: &'static [EMissionDNA],
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, VariantArray, Serialize, Deserialize,
+)]
 pub enum EMissionTemplate {
     MissionType_Extraction,
     MissionType_Motherlode,
@@ -467,7 +473,9 @@ impl EMissionTemplate {
 
 #[derive(Debug)]
 pub struct UMissionComplexity {}
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, VariantArray, Serialize, Deserialize,
+)]
 pub enum EMissionComplexity {
     MD_Complexity_Complex,
     MD_Complexity_Average,
@@ -476,14 +484,18 @@ pub enum EMissionComplexity {
 
 #[derive(Debug)]
 pub struct UMissionDuration {}
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, VariantArray, Serialize, Deserialize,
+)]
 pub enum EMissionDuration {
     MD_Duration_Long,
     MD_Duration_Normal,
     MD_Duration_Short,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, VariantArray, Serialize, Deserialize,
+)]
 pub enum EMissionDNA {
     DNA_2_01,
     DNA_2_02,
@@ -975,7 +987,20 @@ pub fn get_hard_template() -> &'static UDeepDiveTemplate {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    VariantArray,
+    Serialize,
+    Deserialize,
+    IntoStaticStr,
+)]
 pub enum EObjective {
     OBJ_1st_DeepScan,
     OBJ_1st_Escort,
@@ -1011,7 +1036,20 @@ pub enum EObjective {
     OBJ_WRN_Plague,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    VariantArray,
+    Serialize,
+    Deserialize,
+    IntoStaticStr,
+)]
 pub enum EMissionMutator {
     MMUT_ExplosiveEnemies,
     MMUT_ExterminationContract,
@@ -1025,7 +1063,20 @@ pub enum EMissionMutator {
     MMUT_LowGravity,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    VariantArray,
+    Serialize,
+    Deserialize,
+    IntoStaticStr,
+)]
 pub enum EMissionWarning {
     WRN_RegenerativeEnemies,
     WRN_HeroEnemies,
@@ -1110,7 +1161,9 @@ impl EMissionWarning {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, VariantArray, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, VariantArray, Serialize, Deserialize,
+)]
 pub enum ESeason {
     Season0,
     Season1,
@@ -1159,7 +1212,7 @@ pub struct USeason {
     pub mission_map_event_zone_type: ESeasonMissionMapOverlayType,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct UGeneratedMission {
     pub seed: u32,
     pub template: EMissionTemplate,
@@ -1173,7 +1226,7 @@ pub struct UGeneratedMission {
     pub dna: EMissionDNA,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct UDeepDive {
     pub name: String,
     pub biome: EBiome,
