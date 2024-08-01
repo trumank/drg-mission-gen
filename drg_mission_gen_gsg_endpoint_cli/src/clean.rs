@@ -110,6 +110,7 @@ pub(crate) fn map_primary_objective(obj: &EObjective) -> Result<PrimaryObjective
         EObjective::OBJ_1st_PointExtraction => PrimaryObjective::PointExtraction,
         EObjective::OBJ_1st_Refinery => PrimaryObjective::Refinery,
         EObjective::OBJ_1st_Salvage => PrimaryObjective::Salvage,
+        EObjective::OBJ_Eliminate_Eggs => PrimaryObjective::Elimination,
         unexpected_obj => {
             return Err(CleanError::UnexpectedPrimaryObjective(
                 unexpected_obj.into(),

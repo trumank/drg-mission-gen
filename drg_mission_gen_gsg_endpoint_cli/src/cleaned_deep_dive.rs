@@ -63,6 +63,7 @@ pub(crate) enum PrimaryObjective {
     PointExtraction,
     Refinery,
     Salvage,
+    Elimination,
 }
 
 impl PrimaryObjective {
@@ -76,6 +77,7 @@ impl PrimaryObjective {
             PrimaryObjective::PointExtraction => "Point Extraction",
             PrimaryObjective::Refinery => "On-Site Refinery",
             PrimaryObjective::Salvage => "Salvage Operation",
+            PrimaryObjective::Elimination => "Elimination",
         }
     }
 
@@ -113,7 +115,7 @@ impl PrimaryObjective {
             },
             PrimaryObjective::IndustrialSabotage => {
                 match (duration, complexity) {
-                    (Duration::Short, Complexity::Simple | Complexity::Average) => "Industrial Sabotage",
+                    (Duration::Normal, Complexity::Simple | Complexity::Average) => "Industrial Sabotage",
                     (dur, comp) => unreachable!(
                         "unexpected industrial sabotage duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                     ),
@@ -155,6 +157,15 @@ impl PrimaryObjective {
                     ),
                 }
             },
+            PrimaryObjective::Elimination => {
+                match (duration, complexity) {
+                    (Duration::Normal, Complexity::Average) => "Kill 2 dreadnoughts",
+                    (Duration::Long, Complexity::Complex) => "Kill 3 dreadnoughts",
+                    (dur, comp) => unreachable!(
+                        "unexpected elimination duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                    ),
+                }
+            }
         }
     }
 }
@@ -241,7 +252,7 @@ impl Warning {
             Warning::ShieldDisruption => "Shield Disruption",
             Warning::Parasites => "Parasites",
             Warning::Swarmageddon => "Swarmageddon",
-            Warning::RivalPresence => "RivalPresence",
+            Warning::RivalPresence => "Rival Presence",
         }
     }
 }
