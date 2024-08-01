@@ -5,7 +5,7 @@ use data::{get_deep_dive_settings, get_hard_template, get_mission_setup, get_nor
 
 // Public re-exports.
 pub use data::{
-    EBiome, EMissionComplexity, EMissionDuration, EMissionMutator, EMissionTemplate,
+    EBiome, EMissionComplexity, EMissionDNA, EMissionDuration, EMissionMutator, EMissionTemplate,
     EMissionWarning, EObjective, EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UDeepDive,
     UDeepDiveTemplate, UGeneratedMission, UMissionDNA,
 };
