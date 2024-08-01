@@ -13,8 +13,8 @@ pub(crate) enum EndpointError {
         status_text: String,
         response_body: String,
     },
-    #[error("response failed to deserialize into expected `DeepDiveResponse` JSON format")]
-    FailedToDeserialize,
+    #[error("response failed to deserialize into expected `DeepDiveResponse` JSON format: {0}")]
+    FailedToDeserialize(std::io::Error),
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
     #[error("ureq error: {0}")]
@@ -39,5 +39,5 @@ pub(crate) fn query_gsg_deep_dive_endpoint() -> Result<DeepDiveResponse, Endpoin
 
     raw_response
         .into_json::<DeepDiveResponse>()
-        .map_err(|_| EndpointError::FailedToDeserialize)
+        .map_err(|e| EndpointError::FailedToDeserialize(e))
 }
