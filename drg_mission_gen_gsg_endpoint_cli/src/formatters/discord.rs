@@ -1,5 +1,3 @@
-use std::iter;
-
 use time::OffsetDateTime;
 
 use crate::cleaned_deep_dive::{
@@ -116,6 +114,9 @@ fn format_primary_objective(
         }
         PrimaryObjective::Salvage => {
             format!(":molly: {}", obj.display_detailed(complexity, duration))
+        }
+        PrimaryObjective::Elimination => {
+            format!(":dreadegg: {}", obj.display_detailed(complexity, duration))
         }
     }
 }
