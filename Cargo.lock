@@ -198,13 +198,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "drg_mission_gen_seed_cli"
-version = "0.1.0"
-dependencies = [
- "drg_mission_gen_core",
-]
-
-[[package]]
 name = "drg_mission_gen_tracing"
 version = "0.1.0"
 dependencies = [

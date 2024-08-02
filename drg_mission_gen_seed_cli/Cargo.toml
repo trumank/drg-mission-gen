@@ -1,8 +1,0 @@
-[package]
-name = "drg_mission_gen_seed_cli"
-edition.workspace = true
-license.workspace = true
-version.workspace = true
-
-[dependencies]
-drg_mission_gen_core = { path = "../drg_mission_gen_core" }

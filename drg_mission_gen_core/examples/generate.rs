@@ -1,4 +1,6 @@
-use drg_mission_gen_core::gen_deep_dive_pair;
+use std::collections::HashMap;
+
+use drg_mission_gen_core::{gen_deep_dive_pair, EBiome, EMissionDNA, EMissionMutator, EObjective};
 
 fn main() {
     let (normal, hard) = gen_deep_dive_pair(
