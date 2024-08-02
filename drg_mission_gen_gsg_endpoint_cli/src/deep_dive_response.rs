@@ -81,7 +81,7 @@ mod gsg_iso8601_offset_datetime {
     where
         S: Serializer,
     {
-        let s = format!("{}", date.format(&ISO8601_CUSTOM).unwrap());
+        let s = date.format(&ISO8601_CUSTOM).unwrap().to_string();
         serializer.serialize_str(&s)
     }
 

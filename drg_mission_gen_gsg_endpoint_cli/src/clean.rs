@@ -40,7 +40,7 @@ pub(crate) fn clean_unreal_deep_dive(dd: &UDeepDive) -> Result<DeepDive, CleanEr
     let missions = dd
         .missions
         .iter()
-        .map(|mission| map_mission(mission))
+        .map(map_mission)
         .collect::<Result<Vec<Mission>, CleanError>>()?;
     assert_eq!(
         missions.len(),
@@ -87,8 +87,8 @@ pub(crate) fn map_mission(mission: &UGeneratedMission) -> Result<Mission, CleanE
     } = mission.dna.get();
     // FIXME(jieyouxu): maybe we should just use `mission_dna`? or does (sometimes) available
     // complexity/duration take precedence?
-    let complexity = map_complexity(&complexity);
-    let duration = map_duration(&duration);
+    let complexity = map_complexity(complexity);
+    let duration = map_duration(duration);
 
     Ok(Mission {
         primary_objective,

@@ -94,6 +94,7 @@ fn format_primary_objective(
     complexity: Complexity,
     duration: Duration,
 ) -> String {
+    #[allow(clippy::useless_format)]
     match obj {
         PrimaryObjective::DeepScan => {
             format!(":pingdrg: {}", obj.display_detailed(complexity, duration))

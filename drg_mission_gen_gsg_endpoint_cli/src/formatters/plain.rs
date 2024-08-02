@@ -12,17 +12,17 @@ pub(crate) fn format_plain(
     start_datetime: OffsetDateTime,
     end_datetime: OffsetDateTime,
 ) -> String {
-    let header = format!("=== Deep Dive Info ===");
+    let header = "=== Deep Dive Info ===".to_string();
     let start_date = start_datetime.date();
     let end_date = end_datetime.date();
     let week_start = format!("Start: {start_date}");
     let week_end = format!("End: {end_date}");
     let seed = format!("Seed: {}", pair.elite.seed);
 
-    let normal_dd_title = format!("=== Normal Deep Dive ===");
+    let normal_dd_title = "=== Normal Deep Dive ===".to_string();
     let normal_info = format_plain_dd(&pair.normal);
 
-    let elite_dd_title = format!("=== Elite Deep Dive ===");
+    let elite_dd_title = "=== Elite Deep Dive ===".to_string();
     let elite_info = format_plain_dd(&pair.elite);
 
     [

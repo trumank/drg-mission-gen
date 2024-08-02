@@ -30,7 +30,7 @@ pub(crate) fn query_gsg_deep_dive_endpoint() -> Result<DeepDiveResponse, Endpoin
             return Err(EndpointError::RequestFailed {
                 url: GSG_DEEP_DIVE_ENDPOINT,
                 status_code: code,
-                status_text: status_text,
+                status_text,
                 response_body: res_body,
             });
         }
@@ -39,5 +39,5 @@ pub(crate) fn query_gsg_deep_dive_endpoint() -> Result<DeepDiveResponse, Endpoin
 
     raw_response
         .into_json::<DeepDiveResponse>()
-        .map_err(|e| EndpointError::FailedToDeserialize(e))
+        .map_err(EndpointError::FailedToDeserialize)
 }
