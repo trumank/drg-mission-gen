@@ -17,13 +17,15 @@ pub(crate) fn format_discord(
     let end_date = end_datetime.date();
     let end_timestamp = end_datetime.unix_timestamp();
 
+    let seed = pair.normal.seed;
     let dd_info = format_dive(&pair.normal);
     let edd_info = format_dive(&pair.elite);
 
     format!(
         "\
         Weekly Deep Dives information for **{start_date} to {end_date}**.\n\
-        Deep Dives will reset **<t:{end_timestamp}:F>** (<t:{end_timestamp}:R>)\n\n\
+        Deep Dives will reset **<t:{end_timestamp}:F>** (<t:{end_timestamp}:R>)\n\
+        Seed: {seed} \n\n\
         :Deep_Dive: __**DEEP DIVE**__ :Deep_Dive:\n\
         {dd_info}\n\n\
         :Deep_Dive: __**ELITE DEEP DIVE**__ :Deep_Dive:\n\
