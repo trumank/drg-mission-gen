@@ -9,8 +9,8 @@ use crate::cleaned_deep_dive::Mission;
 #[tabled(rename_all = "PascalCase")]
 pub(crate) struct Stage {
     stage: usize,
-    primary: &'static str,
-    secondary: &'static str,
+    primary: String,
+    secondary: String,
     warning: &'static str,
     mutator: &'static str,
 }

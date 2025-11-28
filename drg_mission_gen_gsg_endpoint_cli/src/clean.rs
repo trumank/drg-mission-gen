@@ -5,7 +5,7 @@ use thiserror::Error;
 
 use drg_mission_gen_core::{
     EBiome, EMissionComplexity, EMissionDuration, EMissionMutator, EMissionWarning, EObjective,
-    UDeepDive, UGeneratedMission, UMissionDNA,
+    ObjectiveInstance, UDeepDive, UGeneratedMission, UMissionDNA,
 };
 
 use crate::cleaned_deep_dive::{
@@ -100,48 +100,74 @@ pub(crate) fn map_mission(mission: &UGeneratedMission) -> Result<Mission, CleanE
     })
 }
 
-pub(crate) fn map_primary_objective(obj: &EObjective) -> Result<PrimaryObjective, CleanError> {
-    let obj = match obj {
-        EObjective::OBJ_1st_DeepScan => PrimaryObjective::DeepScan,
-        EObjective::OBJ_1st_Escort => PrimaryObjective::EscortDuty,
-        EObjective::OBJ_1st_Extraction => PrimaryObjective::MiningExpedition,
-        EObjective::OBJ_1st_Facility => PrimaryObjective::IndustrialSabotage,
-        EObjective::OBJ_1st_Gather_AlienEggs => PrimaryObjective::EggHunt,
-        EObjective::OBJ_1st_PointExtraction => PrimaryObjective::PointExtraction,
-        EObjective::OBJ_1st_Refinery => PrimaryObjective::Refinery,
-        EObjective::OBJ_1st_Salvage => PrimaryObjective::Salvage,
-        EObjective::OBJ_Eliminate_Eggs => PrimaryObjective::Elimination,
-        unexpected_obj => {
-            return Err(CleanError::UnexpectedPrimaryObjective(
-                unexpected_obj.into(),
-            ))
+pub(crate) fn map_primary_objective(
+    obj: &ObjectiveInstance,
+) -> Result<PrimaryObjective, CleanError> {
+    match obj {
+        ObjectiveInstance::Elimination { kind, targets } => {
+            if *kind == EObjective::OBJ_Eliminate_Eggs {
+                Ok(PrimaryObjective::Elimination {
+                    targets: targets.clone(),
+                })
+            } else {
+                Err(CleanError::UnexpectedPrimaryObjective(kind.into()))
+            }
         }
-    };
-    Ok(obj)
+        ObjectiveInstance::Other { kind } => {
+            let obj = match kind {
+                EObjective::OBJ_1st_DeepScan => PrimaryObjective::DeepScan,
+                EObjective::OBJ_1st_Escort => PrimaryObjective::EscortDuty,
+                EObjective::OBJ_1st_Extraction => PrimaryObjective::MiningExpedition,
+                EObjective::OBJ_1st_Facility => PrimaryObjective::IndustrialSabotage,
+                EObjective::OBJ_1st_Gather_AlienEggs => PrimaryObjective::EggHunt,
+                EObjective::OBJ_1st_PointExtraction => PrimaryObjective::PointExtraction,
+                EObjective::OBJ_1st_Refinery => PrimaryObjective::Refinery,
+                EObjective::OBJ_1st_Salvage => PrimaryObjective::Salvage,
+                unexpected_obj => {
+                    return Err(CleanError::UnexpectedPrimaryObjective(
+                        unexpected_obj.into(),
+                    ))
+                }
+            };
+            Ok(obj)
+        }
+    }
 }
 
 pub(crate) fn map_secondary_objective(
-    objs: &[EObjective],
+    objs: &[ObjectiveInstance],
 ) -> Result<DeepDiveSecondaryObjective, CleanError> {
     let [obj] = objs else {
         return Err(CleanError::SecondaryObjectivesCountMismatch { count: objs.len() });
     };
 
-    let obj = match obj {
-        EObjective::OBJ_DD_AlienEggs => DeepDiveSecondaryObjective::Eggs,
-        EObjective::OBJ_DD_DeepScan => DeepDiveSecondaryObjective::DeepScan,
-        EObjective::OBJ_DD_Defense => DeepDiveSecondaryObjective::Blackbox,
-        EObjective::OBJ_DD_Elimination_Eggs => DeepDiveSecondaryObjective::Dreadnought,
-        EObjective::OBJ_DD_Morkite => DeepDiveSecondaryObjective::Morkite,
-        EObjective::OBJ_DD_MorkiteWell => DeepDiveSecondaryObjective::Pumpjack,
-        EObjective::OBJ_DD_RepairMinimules => DeepDiveSecondaryObjective::Minimules,
-        unexpected_obj => {
-            return Err(CleanError::UnexpectedSecondaryObjective(
-                unexpected_obj.into(),
-            ))
+    match obj {
+        ObjectiveInstance::Elimination { kind, targets } => {
+            if *kind == EObjective::OBJ_DD_Elimination_Eggs {
+                Ok(DeepDiveSecondaryObjective::Dreadnought {
+                    targets: targets.clone(),
+                })
+            } else {
+                Err(CleanError::UnexpectedSecondaryObjective(kind.into()))
+            }
         }
-    };
-    Ok(obj)
+        ObjectiveInstance::Other { kind } => {
+            let obj = match kind {
+                EObjective::OBJ_DD_AlienEggs => DeepDiveSecondaryObjective::Eggs,
+                EObjective::OBJ_DD_DeepScan => DeepDiveSecondaryObjective::DeepScan,
+                EObjective::OBJ_DD_Defense => DeepDiveSecondaryObjective::Blackbox,
+                EObjective::OBJ_DD_Morkite => DeepDiveSecondaryObjective::Morkite,
+                EObjective::OBJ_DD_MorkiteWell => DeepDiveSecondaryObjective::Pumpjack,
+                EObjective::OBJ_DD_RepairMinimules => DeepDiveSecondaryObjective::Minimules,
+                unexpected_obj => {
+                    return Err(CleanError::UnexpectedSecondaryObjective(
+                        unexpected_obj.into(),
+                    ))
+                }
+            };
+            Ok(obj)
+        }
+    }
 }
 
 pub(crate) fn map_mutator(mutators: &[EMissionMutator]) -> Result<Option<Mutator>, CleanError> {

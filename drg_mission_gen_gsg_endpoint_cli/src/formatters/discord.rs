@@ -121,21 +121,29 @@ fn format_primary_objective(
         PrimaryObjective::Salvage => {
             format!(":molly: {}", obj.display_detailed(complexity, duration))
         }
-        PrimaryObjective::Elimination => {
-            format!(":dreadegg: {}", obj.display_detailed(complexity, duration))
+        PrimaryObjective::Elimination { ref targets } => {
+            let target_str = format_elimination_targets(targets);
+            format!(
+                ":dreadegg: {} {}",
+                obj.display_detailed(complexity, duration),
+                target_str
+            )
         }
     }
 }
 
-fn format_secondary_objective(obj: &DeepDiveSecondaryObjective) -> &'static str {
+fn format_secondary_objective(obj: &DeepDiveSecondaryObjective) -> String {
     match obj {
-        DeepDiveSecondaryObjective::Eggs => ":gegg: 2 Eggs",
-        DeepDiveSecondaryObjective::DeepScan => ":pingdrg: Perform 2 Deep Scans",
-        DeepDiveSecondaryObjective::Blackbox => ":uplink: Black Box",
-        DeepDiveSecondaryObjective::Dreadnought => ":dreadegg: Dreadnought",
-        DeepDiveSecondaryObjective::Morkite => ":morkite: 150 Morkite",
-        DeepDiveSecondaryObjective::Pumpjack => ":refinerywell: Connect 1 Pumpjack",
-        DeepDiveSecondaryObjective::Minimules => ":molly: Repair 2 Mini-mules",
+        DeepDiveSecondaryObjective::Eggs => ":gegg: 2 Eggs".to_string(),
+        DeepDiveSecondaryObjective::DeepScan => ":pingdrg: Perform 2 Deep Scans".to_string(),
+        DeepDiveSecondaryObjective::Blackbox => ":uplink: Black Box".to_string(),
+        DeepDiveSecondaryObjective::Dreadnought { targets } => {
+            let target_str = format_elimination_targets(targets);
+            format!(":dreadegg: Dreadnought ({})", target_str)
+        }
+        DeepDiveSecondaryObjective::Morkite => ":morkite: 150 Morkite".to_string(),
+        DeepDiveSecondaryObjective::Pumpjack => ":refinerywell: Connect 1 Pumpjack".to_string(),
+        DeepDiveSecondaryObjective::Minimules => ":molly: Repair 2 Mini-mules".to_string(),
     }
 }
 
@@ -145,4 +153,23 @@ fn format_mutator(mutator: Mutator) -> String {
 
 fn format_warning(warning: Warning) -> String {
     format!(":tothebone: **{}**", warning.display())
+}
+
+fn format_enemy_descriptor(descriptor: EDreadnought) -> &'static str {
+    match descriptor {
+        EDreadnought::Dreadnought => "OG",
+        EDreadnought::Hiveguard => "H",
+        EDreadnought::Twins => "T",
+    }
+}
+
+fn format_elimination_targets(targets: &[EDreadnought]) -> String {
+    if targets.is_empty() {
+        return String::new();
+    }
+    let target_strs: Vec<&str> = targets
+        .iter()
+        .map(|t| format_enemy_descriptor(*t))
+        .collect();
+    format!("({})", target_strs.join("+"))
 }

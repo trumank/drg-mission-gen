@@ -5,9 +5,9 @@ use data::{get_deep_dive_settings, get_hard_template, get_mission_setup, get_nor
 
 // Public re-exports.
 pub use data::{
-    EBiome, EMissionComplexity, EMissionDNA, EMissionDuration, EMissionMutator, EMissionTemplate,
-    EMissionWarning, EObjective, EPlanetZone, FDeepDiveTemplateItem, FRandInterval, UDeepDive,
-    UDeepDiveTemplate, UGeneratedMission, UMissionDNA,
+    EBiome, EDreadnought, EMissionComplexity, EMissionDNA, EMissionDuration, EMissionMutator,
+    EMissionTemplate, EMissionWarning, EObjective, EPlanetZone, FDeepDiveTemplateItem,
+    FRandInterval, ObjectiveInstance, UDeepDive, UDeepDiveTemplate, UGeneratedMission, UMissionDNA,
 };
 
 use rand::FRandomStream;
@@ -86,6 +86,43 @@ fn shuffle<T>(rand: &mut FRandomStream, vec: &mut [T]) {
 fn randomly_shrink<T>(rand: &mut FRandomStream, size: usize, vec: &mut Vec<T>) {
     while vec.len() > size {
         vec.swap_remove(rand.rand_helper(vec.len() as i32) as usize);
+    }
+}
+
+impl UGeneratedMission {
+    fn initialize_objectives(&mut self) {
+        let mut rand = FRandomStream::new(self.seed);
+        rand.mutate(); // UGeneratedMission::InitializePLS
+        rand.mutate(); // AProceduralSetup::InitializePLS
+
+        self.primary_objective.init(&mut rand);
+        for obj in &mut self.secondary_objectives {
+            obj.init(&mut rand);
+        }
+    }
+}
+
+impl ObjectiveInstance {
+    fn init(&mut self, rand: &mut FRandomStream) {
+        if let ObjectiveInstance::Elimination {
+            kind,
+            ref mut targets,
+        } = self
+        {
+            let count = match kind {
+                EObjective::OBJ_Eliminate_Eggs => 2,
+                EObjective::OBJ_DD_Elimination_Eggs => 1,
+                _ => unreachable!(),
+            };
+            let mut pool = vec![
+                data::EDreadnought::Dreadnought,
+                data::EDreadnought::Hiveguard,
+                data::EDreadnought::Twins,
+            ];
+            *targets = (0..count)
+                .map(|_| rand.rand_swap_remove(&mut pool))
+                .collect();
+        }
     }
 }
 
@@ -420,18 +457,22 @@ fn gen_deep_dive(
                 .unwrap()
         };
 
-        let stage = UGeneratedMission {
+        let mut stage = UGeneratedMission {
             seed: mission_seed,
             template: stage_template.0,
             biome,
-            primary_objective,
-            secondary_objectives,
+            primary_objective: ObjectiveInstance::from_objective(primary_objective),
+            secondary_objectives: secondary_objectives
+                .iter()
+                .map(|o| ObjectiveInstance::from_objective(*o))
+                .collect(),
             warnings: warning.into_iter().collect(),
             mutators: mutator.into_iter().collect(),
             complexity_limit: stage_template.2,
             duration_limit: stage_template.1,
             dna,
         };
+        stage.initialize_objectives();
 
         stages.push(stage);
     }
@@ -559,6 +600,108 @@ mod test {
             println!("seed = {}", dd.seed);
             pretty_assertions::assert_eq!(dd.normal.missions, normal.missions, "normal");
             pretty_assertions::assert_eq!(dd.hard.missions, hard.missions, "hard");
+        }
+    }
+
+    #[test]
+    fn test_deep_dive_dreads() {
+        use data::EDreadnought;
+
+        fn to_descriptors(expected: &[&str]) -> Vec<EDreadnought> {
+            expected
+                .iter()
+                .map(|s| match *s {
+                    "OG" => EDreadnought::Dreadnought,
+                    "H" => EDreadnought::Hiveguard,
+                    "T" => EDreadnought::Twins,
+                    _ => panic!("unknown dread: {}", s),
+                })
+                .collect()
+        }
+
+        struct TestCase {
+            seed: u32,
+            is_hard: bool,
+            stage: usize, // 1-indexed
+            expected: &'static [&'static str],
+        }
+
+        #[rustfmt::skip]
+        let cases = [
+            TestCase { seed: 66099,  is_hard: false, stage: 3, expected: &["T", "H"] },
+            TestCase { seed: 66099,  is_hard: true,  stage: 3, expected: &["T"] },
+            TestCase { seed: 50221,  is_hard: false, stage: 3, expected: &["OG"] },
+            TestCase { seed: 103089, is_hard: true,  stage: 2, expected: &["T"] },
+            TestCase { seed: 24223,  is_hard: true,  stage: 3, expected: &["H", "T"] },
+            TestCase { seed: 97899,  is_hard: false, stage: 1, expected: &["T"] },
+            TestCase { seed: 97899,  is_hard: false, stage: 3, expected: &["OG", "T"] },
+            TestCase { seed: 97899,  is_hard: true,  stage: 1, expected: &["T"] },
+            TestCase { seed: 53243,  is_hard: false, stage: 2, expected: &["OG", "T"] },
+            TestCase { seed: 53243,  is_hard: false, stage: 3, expected: &["H"] },
+            TestCase { seed: 16814,  is_hard: false, stage: 1, expected: &["T"] },
+            TestCase { seed: 16814,  is_hard: false, stage: 2, expected: &["OG"] },
+            TestCase { seed: 16814,  is_hard: false, stage: 3, expected: &["T", "H"] },
+            TestCase { seed: 16814,  is_hard: true,  stage: 2, expected: &["H"] },
+            TestCase { seed: 79402,  is_hard: false, stage: 1, expected: &["T"] },
+            TestCase { seed: 25226,  is_hard: true,  stage: 2, expected: &["H", "OG"] },
+            TestCase { seed: 22382,  is_hard: true,  stage: 2, expected: &["OG", "H"] },
+            TestCase { seed: 22382,  is_hard: true,  stage: 3, expected: &["OG"] },
+            TestCase { seed: 16553,  is_hard: false, stage: 1, expected: &["H"] },
+            TestCase { seed: 16553,  is_hard: true,  stage: 2, expected: &["T"] },
+            TestCase { seed: 13876,  is_hard: false, stage: 1, expected: &["OG", "T"] },
+            TestCase { seed: 57612,  is_hard: false, stage: 3, expected: &["OG", "T"] },
+            TestCase { seed: 57612,  is_hard: true,  stage: 2, expected: &["T"] },
+            TestCase { seed: 127529, is_hard: false, stage: 1, expected: &["H", "T"] },
+            TestCase { seed: 98788,  is_hard: true,  stage: 3, expected: &["H", "OG"] },
+            TestCase { seed: 42446,  is_hard: false, stage: 1, expected: &["T"] },
+            TestCase { seed: 70121,  is_hard: false, stage: 1, expected: &["H"] },
+            TestCase { seed: 70121,  is_hard: true,  stage: 1, expected: &["H", "T"] },
+            TestCase { seed: 40958,  is_hard: true,  stage: 1, expected: &["T", "H"] },
+            TestCase { seed: 40958,  is_hard: true,  stage: 3, expected: &["H", "T"] },
+            TestCase { seed: 42739,  is_hard: false, stage: 1, expected: &["OG"] },
+            TestCase { seed: 42739,  is_hard: false, stage: 3, expected: &["H", "T"] },
+            TestCase { seed: 58614,  is_hard: false, stage: 1, expected: &["T"] },
+            TestCase { seed: 27594,  is_hard: true,  stage: 1, expected: &["OG"] },
+            TestCase { seed: 27594,  is_hard: true,  stage: 3, expected: &["T"] },
+            TestCase { seed: 127539, is_hard: true,  stage: 1, expected: &["H", "T"] },
+        ];
+
+        for case in cases {
+            let (normal, hard) = gen_deep_dive_pair(case.seed);
+            let dive = if case.is_hard { &hard } else { &normal };
+            let stage = &dive.missions[case.stage - 1];
+
+            let mut all_targets: Vec<EDreadnought> = vec![];
+
+            if let ObjectiveInstance::Elimination { ref targets, .. } = stage.primary_objective {
+                all_targets.extend(targets);
+            }
+
+            for obj in &stage.secondary_objectives {
+                if let ObjectiveInstance::Elimination { ref targets, .. } = obj {
+                    all_targets.extend(targets);
+                }
+            }
+
+            let expected = to_descriptors(case.expected);
+
+            assert!(
+                !all_targets.is_empty(),
+                "seed {} stage {} has no elimination objective",
+                case.seed,
+                case.stage
+            );
+
+            assert_eq!(
+                all_targets,
+                expected,
+                "seed {} {} stage {}: expected {:?}, got {:?}",
+                case.seed,
+                if case.is_hard { "hard" } else { "normal" },
+                case.stage,
+                expected,
+                all_targets
+            );
         }
     }
 }

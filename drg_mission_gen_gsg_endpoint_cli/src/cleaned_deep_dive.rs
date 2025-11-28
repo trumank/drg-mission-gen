@@ -4,6 +4,8 @@
 use serde::{Deserialize, Serialize};
 use strum::IntoStaticStr;
 
+use drg_mission_gen_core::EDreadnought;
+
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub(crate) struct DeepDive {
     pub(crate) name: String,
@@ -53,7 +55,20 @@ pub(crate) struct Mission {
     pub(crate) duration: Duration,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+fn format_elimination_targets(targets: &[EDreadnought]) -> String {
+    let list = targets
+        .iter()
+        .map(|d| match d {
+            EDreadnought::Dreadnought => "D",
+            EDreadnought::Hiveguard => "H",
+            EDreadnought::Twins => "T",
+        })
+        .collect::<Vec<_>>()
+        .join("+");
+    format!("Dreadnought x{} ({})", targets.len(), list)
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) enum PrimaryObjective {
     DeepScan,
     EscortDuty,
@@ -63,11 +78,11 @@ pub(crate) enum PrimaryObjective {
     PointExtraction,
     Refinery,
     Salvage,
-    Elimination,
+    Elimination { targets: Vec<EDreadnought> },
 }
 
 impl PrimaryObjective {
-    pub(crate) fn display(self) -> &'static str {
+    pub(crate) fn display(&self) -> &'static str {
         match self {
             PrimaryObjective::DeepScan => "Deep Scan",
             PrimaryObjective::EscortDuty => "Escort Duty",
@@ -77,37 +92,33 @@ impl PrimaryObjective {
             PrimaryObjective::PointExtraction => "Point Extraction",
             PrimaryObjective::Refinery => "On-Site Refinery",
             PrimaryObjective::Salvage => "Salvage Operation",
-            PrimaryObjective::Elimination => "Elimination",
+            PrimaryObjective::Elimination { .. } => "Elimination",
         }
     }
 
     /// Reference: <https://deeprockgalactic.wiki.gg/wiki/Missions>.
-    pub(crate) fn display_detailed(
-        self,
-        complexity: Complexity,
-        duration: Duration,
-    ) -> &'static str {
+    pub(crate) fn display_detailed(&self, complexity: Complexity, duration: Duration) -> String {
         match self {
             PrimaryObjective::DeepScan => match (duration, complexity) {
-                (Duration::Short, Complexity::Average) => "Perform 3 Deep Scans",
-                (Duration::Normal, Complexity::Average) => "Perform 5 Deep Scans",
+                (Duration::Short, Complexity::Average) => "Perform 3 Deep Scans".to_string(),
+                (Duration::Normal, Complexity::Average) => "Perform 5 Deep Scans".to_string(),
                 (dur, comp) => unreachable!(
                     "unexpected deep scan duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                 ),
             },
             PrimaryObjective::EscortDuty => match (duration, complexity) {
-                (Duration::Normal, Complexity::Average | Complexity::Complex) => "Escort Duty",
+                (Duration::Normal, Complexity::Average | Complexity::Complex) => "Escort Duty".to_string(),
                 (dur, comp) => unreachable!(
                     "unexpected escort duty duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                 ),
             },
             PrimaryObjective::MiningExpedition => {
                 match (duration, complexity) {
-                    (Duration::Short, Complexity::Simple) => "200 Morkite",
-                    (Duration::Normal, Complexity::Simple) => "225 Morkite",
-                    (Duration::Normal, Complexity::Average) => "250 Morkite",
-                    (Duration::Long, Complexity::Average) => "325 Morkite",
-                    (Duration::Long, Complexity::Complex) => "400 Morkite",
+                    (Duration::Short, Complexity::Simple) => "200 Morkite".to_string(),
+                    (Duration::Normal, Complexity::Simple) => "225 Morkite".to_string(),
+                    (Duration::Normal, Complexity::Average) => "250 Morkite".to_string(),
+                    (Duration::Long, Complexity::Average) => "325 Morkite".to_string(),
+                    (Duration::Long, Complexity::Complex) => "400 Morkite".to_string(),
                     (dur, comp) => unreachable!(
                         "unexpected escort duty duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                     ),
@@ -115,7 +126,7 @@ impl PrimaryObjective {
             },
             PrimaryObjective::IndustrialSabotage => {
                 match (duration, complexity) {
-                    (Duration::Normal, Complexity::Simple | Complexity::Average) => "Industrial Sabotage",
+                    (Duration::Normal, Complexity::Simple | Complexity::Average) => "Industrial Sabotage".to_string(),
                     (dur, comp) => unreachable!(
                         "unexpected industrial sabotage duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                     ),
@@ -123,9 +134,9 @@ impl PrimaryObjective {
             },
             PrimaryObjective::EggHunt => {
                 match (duration, complexity) {
-                    (Duration::Short, Complexity::Simple) => "4 Eggs",
-                    (Duration::Normal, Complexity::Average) => "6 Eggs",
-                    (Duration::Long, Complexity::Average) => "8 Eggs",
+                    (Duration::Short, Complexity::Simple) => "4 Eggs".to_string(),
+                    (Duration::Normal, Complexity::Average) => "6 Eggs".to_string(),
+                    (Duration::Long, Complexity::Average) => "8 Eggs".to_string(),
                     (dur, comp) => unreachable!(
                         "unexpected egg hunt duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                     ),
@@ -133,8 +144,8 @@ impl PrimaryObjective {
             },
             PrimaryObjective::PointExtraction => {
                 match (duration, complexity) {
-                    (Duration::Normal, Complexity::Complex) => "7 Aquarqs",
-                    (Duration::Long, Complexity::Complex) => "10 Aquarqs",
+                    (Duration::Normal, Complexity::Complex) => "7 Aquarqs".to_string(),
+                    (Duration::Long, Complexity::Complex) => "10 Aquarqs".to_string(),
                     (dur, comp) => unreachable!(
                         "unexpected point extraction duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                     ),
@@ -142,7 +153,7 @@ impl PrimaryObjective {
             },
             PrimaryObjective::Refinery => {
                 match (duration, complexity) {
-                    (Duration::Normal, Complexity::Average | Complexity::Complex) => "On-Site Refinery",
+                    (Duration::Normal, Complexity::Average | Complexity::Complex) => "On-Site Refinery".to_string(),
                     (dur, comp) => unreachable!(
                         "unexpected refinery duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                     ),
@@ -150,47 +161,50 @@ impl PrimaryObjective {
             },
             PrimaryObjective::Salvage => {
                 match (duration, complexity) {
-                    (Duration::Normal, Complexity::Average) => "2 Mini-mules",
-                    (Duration::Long, Complexity::Complex) => "3 Mini-mules",
+                    (Duration::Normal, Complexity::Average) => "2 Mini-mules".to_string(),
+                    (Duration::Long, Complexity::Complex) => "3 Mini-mules".to_string(),
                     (dur, comp) => unreachable!(
                         "unexpected point extraction duration/complexity combination: duration={dur:?}, complexity={comp:?}",
                     ),
                 }
             },
-            PrimaryObjective::Elimination => {
-                match (duration, complexity) {
-                    (Duration::Normal, Complexity::Average) => "Kill 2 dreadnoughts",
-                    (Duration::Long, Complexity::Complex) => "Kill 3 dreadnoughts",
-                    (dur, comp) => unreachable!(
-                        "unexpected elimination duration/complexity combination: duration={dur:?}, complexity={comp:?}",
-                    ),
-                }
+            PrimaryObjective::Elimination { targets } => {
+                format_elimination_targets(targets)
+                // match (duration, complexity) {
+                //     (Duration::Normal, Complexity::Average) => "Kill 2 dreadnoughts".to_string(),
+                //     (Duration::Long, Complexity::Complex) => "Kill 3 dreadnoughts".to_string(),
+                //     (dur, comp) => unreachable!(
+                //         "unexpected elimination duration/complexity combination: duration={dur:?}, complexity={comp:?}",
+                //     ),
+                // }
             }
         }
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) enum DeepDiveSecondaryObjective {
     Eggs,
     DeepScan,
     Blackbox,
-    Dreadnought,
+    Dreadnought { targets: Vec<EDreadnought> },
     Morkite,
     Pumpjack,
     Minimules,
 }
 
 impl DeepDiveSecondaryObjective {
-    pub(crate) fn display(self) -> &'static str {
+    pub(crate) fn display(&self) -> String {
         match self {
-            DeepDiveSecondaryObjective::Eggs => "Collect 2 Eggs",
-            DeepDiveSecondaryObjective::DeepScan => "Perform 2 Deep Scans",
-            DeepDiveSecondaryObjective::Blackbox => "Defend Black Box",
-            DeepDiveSecondaryObjective::Dreadnought => "Kill 1 Dreadnought",
-            DeepDiveSecondaryObjective::Morkite => "Collect 150 Morkite",
-            DeepDiveSecondaryObjective::Pumpjack => "Refine Liquid Morkite",
-            DeepDiveSecondaryObjective::Minimules => "Repair 2 Mini-mules",
+            DeepDiveSecondaryObjective::Eggs => "Collect 2 Eggs".to_string(),
+            DeepDiveSecondaryObjective::DeepScan => "Perform 2 Deep Scans".to_string(),
+            DeepDiveSecondaryObjective::Blackbox => "Defend Black Box".to_string(),
+            DeepDiveSecondaryObjective::Dreadnought { targets } => {
+                format_elimination_targets(targets)
+            }
+            DeepDiveSecondaryObjective::Morkite => "Collect 150 Morkite".to_string(),
+            DeepDiveSecondaryObjective::Pumpjack => "Refine Liquid Morkite".to_string(),
+            DeepDiveSecondaryObjective::Minimules => "Repair 2 Mini-mules".to_string(),
         }
     }
 }

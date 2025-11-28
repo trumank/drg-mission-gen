@@ -5,16 +5,18 @@ fn main() {
     for seed in 0..0x20000 {
         let (normal, _hard) = gen_deep_dive_pair(seed);
 
-        if normal.missions[0].primary_objective != EObjective::OBJ_1st_Gather_AlienEggs {
+        if normal.missions[0].primary_objective.objective() != EObjective::OBJ_1st_Gather_AlienEggs
+        {
             continue;
         }
-        if normal.missions[1].primary_objective != EObjective::OBJ_1st_Extraction {
+        if normal.missions[1].primary_objective.objective() != EObjective::OBJ_1st_Extraction {
             continue;
         }
         if normal.missions[1].dna != EMissionDNA::DNA_2_01 {
             continue;
         }
-        if normal.missions[2].primary_objective != EObjective::OBJ_1st_Gather_AlienEggs {
+        if normal.missions[2].primary_objective.objective() != EObjective::OBJ_1st_Gather_AlienEggs
+        {
             continue;
         }
         if normal
@@ -26,7 +28,7 @@ fn main() {
                     EObjective::OBJ_DD_Elimination_Eggs,
                     EObjective::OBJ_DD_Defense,
                 ]
-                .contains(s)
+                .contains(&s.objective())
             })
         {
             continue;
