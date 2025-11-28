@@ -1,21 +1,24 @@
-use time::OffsetDateTime;
+use drg_mission_gen_core::EDreadnought;
 
 use crate::cleaned_deep_dive::{
     Complexity, DeepDive, DeepDiveSecondaryObjective, Duration, Mission, Mutator, PrimaryObjective,
     Warning,
 };
 use crate::deep_dive_pair::DeepDivePair;
+use crate::Dates;
 
 /// Format the deep dive information according to what the usual #deep-dive-discussion weekly
 /// post uses. Uses DRG main discord emojis.
-pub(crate) fn format_discord(
-    pair: &DeepDivePair,
-    start_datetime: OffsetDateTime,
-    end_datetime: OffsetDateTime,
-) -> String {
-    let start_date = start_datetime.date();
-    let end_date = end_datetime.date();
-    let end_timestamp = end_datetime.unix_timestamp();
+pub(crate) fn format_discord(pair: &DeepDivePair, dates: Option<&Dates>) -> String {
+    let start_date = dates
+        .map(|d| d.start_datetime.date().to_string())
+        .unwrap_or_else(|| "N/A".to_string());
+    let end_date = dates
+        .map(|d| d.end_datetime.date().to_string())
+        .unwrap_or_else(|| "N/A".to_string());
+    let end_timestamp = dates
+        .map(|d| d.end_datetime.unix_timestamp())
+        .unwrap_or_default();
 
     let seed = pair.normal.seed;
     let dd_info = format_dive(&pair.normal);

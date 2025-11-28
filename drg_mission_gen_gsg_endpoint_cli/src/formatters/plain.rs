@@ -1,20 +1,20 @@
 use tabled::settings::Style;
 use tabled::Table;
-use time::OffsetDateTime;
 
 use crate::cleaned_deep_dive::DeepDive;
 use crate::deep_dive_pair::DeepDivePair;
+use crate::Dates;
 
 use super::mission_to_stage;
 
-pub(crate) fn format_plain(
-    pair: &DeepDivePair,
-    start_datetime: OffsetDateTime,
-    end_datetime: OffsetDateTime,
-) -> String {
+pub(crate) fn format_plain(pair: &DeepDivePair, dates: Option<&Dates>) -> String {
     let header = "=== Deep Dive Info ===".to_string();
-    let start_date = start_datetime.date();
-    let end_date = end_datetime.date();
+    let start_date = dates
+        .map(|d| d.start_datetime.date().to_string())
+        .unwrap_or_else(|| "N/A".to_string());
+    let end_date = dates
+        .map(|d| d.end_datetime.date().to_string())
+        .unwrap_or_else(|| "N/A".to_string());
     let week_start = format!("Start: {start_date}");
     let week_end = format!("End: {end_date}");
     let seed = format!("Seed: {}", pair.elite.seed);
